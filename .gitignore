@@ -1,1 +1,14 @@
 .vs/StockBite/v17/.suo
+*.bin
+*.config
+*.db
+*.db-wal
+*.v2
+*.vsidx
+*.db-shm
+*.json
+*.json
+.vs/StockBite/v17/DocumentLayout.json
+.vs/StockBite/v17/DocumentLayout.json
+*.json
+*.json
