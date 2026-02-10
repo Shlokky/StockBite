@@ -1,0 +1,22 @@
+﻿@{<h2>Product Catalog</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.Name</td>
+            <td>@p.Price</td>
+            <td>@p.Quantity</td>
+        </tr>
+    }
+    </tbody>
+</table>
+}
