@@ -1,13 +1,10 @@
-﻿using StockBite.Models;
-
-namespace StockBite.Models
+﻿namespace StockBite.Models
 {
-    public class Vendor
+    public class Consumer
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
-        public ICollection<VendorProduct> VendorProducts { get; set; } = new List<VendorProduct>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }
