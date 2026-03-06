@@ -5,7 +5,9 @@
 .vs/StockBite/FileContentIndex/ef05af38-7762-4408-9d6a-e4de6decc8a1.vsidx
 .vs/StockBite/FileContentIndex/c6007f8d-1922-4a40-933a-5c601715f642.vsidx
 *.vsidx
+
 *.config
 *.db-shm
 *.db
 *.db-wal
+
