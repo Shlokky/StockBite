@@ -1,6 +1,4 @@
-﻿using StockBite.Models;
-
-namespace StockBite.Models
+﻿namespace StockBite.Models
 {
     public class VendorProduct
     {
@@ -10,6 +8,7 @@ namespace StockBite.Models
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;
         public decimal Price { get; set; }
-        public int Quantity { get; set; } // Available quantity from this vendor
+        public int Quantity { get; set; }
+        public int AvailableQuantity { get; set; }
     }
 }
