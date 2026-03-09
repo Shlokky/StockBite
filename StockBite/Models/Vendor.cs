@@ -1,10 +1,5 @@
 
-﻿namespace StockBite.Models
-{
-    public class Vendor
-    {
-
-﻿using StockBite.Models;
+using StockBite.Models;
 
 namespace StockBite.Models
 {
