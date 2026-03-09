@@ -1,0 +1,62 @@
+﻿@model IEnumerable<StockBite.Models.VendorProduct>
+
+@{
+    ViewData["Title"] = "Choose Vendor";
+    var product = (StockBite.Models.Product)ViewBag.Product;
+}
+
+<h1>Choose Vendor for @product.Name</h1>
+<p>Select a vendor and quantity. This will add the item to your cart.</p>
+@if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+{
+    <img src="@product.ImageUrl" alt="@product.Name" style="width: 180px; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 16px;" />
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Vendor</th>
+            <th>Price</th>
+            <th>Available</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><span class="vendor-badge">@item.Vendor.Name</span></td>
+                <td>@item.Price</td>
+                <td>@item.Quantity</td>
+                <td style="max-width: 140px;">
+                    <form asp-action="AddToCart" method="post" class="d-flex gap-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="vendorProductId" value="@item.Id" />
+                        <input type="number" name="orderQuantity" min="1" class="form-control form-control-sm" required />
+                        <button type="submit" class="btn btn-sm btn-success">Add</button>
+                    </form>
+                </td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-link">Back to Products</a>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder().withUrl("/stockHub").build();
+        connection.on("inventoryUpdated", () => location.reload());
+        connection.start().catch(err => console.error(err));
+    </script>
+}

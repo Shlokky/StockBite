@@ -1,0 +1,66 @@
+﻿@model IEnumerable<StockBite.Models.Order>
+
+@{
+    ViewData["Title"] = "Pending Orders";
+}
+
+<h1>Pending Orders</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order #</th>
+            <th>Consumer</th>
+            <th>Product</th>
+            <th>Vendor</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Placed</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Consumer.Name</td>
+                <td>@item.Product.Name</td>
+                <td>@item.Vendor.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.TotalPrice</td>
+                <td>@item.OrderDate</td>
+                <td>
+                    <form asp-action="ApproveOrder" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@item.Id" />
+                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder().withUrl("/stockHub").build();
+        connection.on("ordersUpdated", () => location.reload());
+        connection.start().catch(err => console.error(err));
+    </script>
+}

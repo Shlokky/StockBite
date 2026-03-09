@@ -1,0 +1,37 @@
+﻿@model IEnumerable<StockBite.Models.VendorProduct>
+
+@{
+    ViewData["Title"] = $"{ViewBag.VendorName} Dashboard";
+}
+
+<h1>@ViewBag.VendorName Dashboard</h1>
+
+<h2>Your Products</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Product.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                <td>
+                    <a asp-action="EditProduct" asp-route-id="@item.Id">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    <a asp-action="Orders">View Your Orders</a>
+</p>

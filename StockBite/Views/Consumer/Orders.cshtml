@@ -1,0 +1,45 @@
+﻿@model IEnumerable<StockBite.Models.Order>
+
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<h1>My Orders</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Vendor</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Placed</th>
+            <th>Approved</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Vendor.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.TotalPrice</td>
+                <td>@item.Status</td>
+                <td>@item.OrderDate</td>
+                <td>@(item.ApprovedAt?.ToString() ?? "-")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder().withUrl("/stockHub").build();
+        connection.on("ordersUpdated", () => location.reload());
+        connection.start().catch(err => console.error(err));
+    </script>
+}
+

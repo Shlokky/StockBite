@@ -1,0 +1,38 @@
+﻿@model IEnumerable<StockBite.Models.VendorProduct>
+
+@{
+    ViewData["Title"] = "Compare Vendors";
+    var product = ViewBag.Product as StockBite.Models.Product;
+}
+
+<h1>Compare Vendors for @product.Name</h1>
+
+<p>Compare vendor prices and availability for @product.Name.</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Vendor</th>
+            <th>Price</th>
+            <th>Available Quantity</th>
+            <th>Availability</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Vendor.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                <td>
+                    @(item.Quantity > 0 ? "In Stock" : "Out of Stock")
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Index">Back to Product List</a>
+</div>
