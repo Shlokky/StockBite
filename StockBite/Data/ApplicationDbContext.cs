@@ -12,7 +12,6 @@ namespace StockBite.Data
 
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Vendor> Vendors => Set<Vendor>();
-        //i just added dbser vendorproducts and fixed some namespace missedmatch changes here 
         public DbSet<VendorProduct> VendorProducts => Set<VendorProduct>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<Consumer> Consumers => Set<Consumer>();

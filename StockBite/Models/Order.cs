@@ -1,4 +1,6 @@
-﻿namespace StockBite.Models
+﻿using StockBite.Models;
+
+namespace StockBite.Models
 {
     public class Order
     {
