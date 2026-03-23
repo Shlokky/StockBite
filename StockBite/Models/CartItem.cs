@@ -1,4 +1,4 @@
-﻿namespace StockBitePrototype.Models
+﻿namespace StockBite.Models
 {
     public class CartItem
     {
