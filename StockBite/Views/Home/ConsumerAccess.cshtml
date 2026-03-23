@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Consumer Access";
+}
+
+<div class="login-page">
+    <div class="login-card app-card">
+        <div class="login-card-copy">
+            <span class="landing-tag">Consumer Access</span>
+            <h1 class="mt-3">Consumer / User</h1>
+            <p class="text-muted mb-4">Start a new guest order or open your existing orders with your tracking code.</p>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <div class="d-grid gap-3">
+                <a asp-controller="Home" asp-action="StartGuestCheckout" class="btn btn-primary">Start New Guest</a>
+            </div>
+
+            <hr class="my-4" />
+
+            <form asp-controller="Home" asp-action="ContinueGuest" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label class="form-label" for="guestCode">Tracking Code</label>
+                    <input type="text" class="form-control text-uppercase" id="guestCode" name="guestCode" placeholder="Enter your guest code" />
+                </div>
+                <button type="submit" class="btn btn-outline-light w-100">Open Existing Orders</button>
+            </form>
+
+            <div class="mt-3 text-center">
+                <a asp-controller="Home" asp-action="Index" class="simple-link">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>

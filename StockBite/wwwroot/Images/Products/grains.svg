@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+  <rect width="400" height="260" fill="#21304a"/>
+  <path d="M120 160c0-26 36-48 80-48s80 22 80 48v18H120z" fill="#f2eadf"/>
+  <path d="M145 158c18-10 32-15 55-15s37 5 55 15" fill="none" stroke="#d7c7b0" stroke-width="8" stroke-linecap="round"/>
+  <rect x="138" y="88" width="124" height="72" rx="16" fill="none" stroke="#ffe6a3" stroke-width="8"/>
+  <text x="200" y="228" text-anchor="middle" fill="#eef4ff" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Rice and Grains</text>
+</svg>

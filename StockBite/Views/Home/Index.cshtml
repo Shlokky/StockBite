@@ -1,104 +1,53 @@
 ﻿@{
-    ViewData["Title"] = "Welcome to StockBite";
+    ViewData["Title"] = "StockBite";
 }
 
-<div class="jumbotron bg-light p-5 rounded-lg m-3">
-    <h1 class="display-4">Welcome to StockBite!</h1>
-    <p class="lead">Your dynamic multi-user supply chain management web application.</p>
-    <hr class="my-4">
-    <p>Simulate logging in as different user roles to explore the system's functionality:</p>
-</div>
+<section class="landing-hero mb-4">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+            <span class="landing-tag">Final Semester Project</span>
+            <h1 class="landing-title mt-3">StockBite is a smart stock and supply website for restaurants.</h1>
+            <p class="landing-copy">
+                StockBite is a simple web project made to help restaurants handle inventory, ordering, and vendor comparison
+                in one place. Instead of managing stock manually, users can work through one clear website.
+            </p>
+            <p class="landing-copy-secondary mb-0">
+                It is designed for admins, stock managers, and consumers, and the goal of the project is to make stock flow
+                easier, faster, and more organized.
+            </p>
+        </div>
+        <div class="col-lg-4">
+            <div class="landing-highlight">
+                <p class="highlight-label">Project Motto</p>
+                <h2 class="h3">Smarter stock. Better supply. Less confusion.</h2>
+                <p class="mb-0">
+                    This project focuses on making daily stock work simple enough for real use and clear enough for presentation.
+                </p>
+            </div>        </div>
+    </div>
+</section>
 
-<div class="row text-center mt-5">
-    <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="my-0 font-weight-normal">Admin</h4>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title pricing-card-title"><i class="bi bi-person-gear"></i></h1>
-                <p>Full control over products, vendors, and system-wide settings.</p>
-                <form asp-controller="Home" asp-action="Login" method="post" class="text-start">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="role" value="Admin" />
-                    <label class="form-label" for="adminPassword">Password</label>
-                    <input type="password" class="form-control mb-2" id="adminPassword" name="password" placeholder="xyzpass" required />
-                    <button type="submit" class="btn btn-lg btn-block btn-primary">Login as Admin</button>
-                </form>
+<section class="landing-story app-card p-4 p-md-5 mb-4">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <p class="landing-section-label">What Is The Project?</p>
+            <h2 class="landing-section-title">A student-built platform for restaurant stock management.</h2>
+            <p class="landing-section-copy mb-0">
+                The main purpose of StockBite is to bring product tracking, vendor comparison, and ordering into one website
+                so restaurant work becomes easier to manage.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <div class="landing-glass-panel">
+                <p class="landing-section-label">Who Is It For?</p>
+                <p class="landing-section-copy mb-3">
+                    This project is for admins, stock managers, and consumers who all need different access inside the same system.
+                </p>
+                <p class="landing-section-label">Why Was It Made?</p>
+                <p class="landing-section-copy mb-0">
+                    It was made to reduce manual stock work and make the ordering process more organized, visible, and easy to explain.
+                </p>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-success text-white">
-                <h4 class="my-0 font-weight-normal">Stock Manager</h4>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title pricing-card-title"><i class="bi bi-boxes"></i></h1>
-                <p>Compare vendor prices, place purchase orders, and manage inventory.</p>
-                <form asp-controller="Home" asp-action="Login" method="post" class="text-start">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="role" value="StockManager" />
-                    <label class="form-label" for="stockManagerPassword">Password</label>
-                    <input type="password" class="form-control mb-2" id="stockManagerPassword" name="password" placeholder="xyzpass" required />
-                    <button type="submit" class="btn btn-lg btn-block btn-success">Login as Stock Manager</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-info text-white">
-                <h4 class="my-0 font-weight-normal">Info</h4>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title pricing-card-title"><i class="bi bi-info-circle"></i></h1>
-                <p>Consumers place orders. The Stock Manager approves and updates inventory.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row text-center mt-5">
-    <div class="col-md-6 offset-md-3">
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <h4 class="my-0 font-weight-normal">Consumer</h4>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title pricing-card-title"><i class="bi bi-cart"></i></h1>
-                <p>Place orders, compare vendor prices, and track approval by the Stock Manager.</p>
-                <form asp-controller="Home" asp-action="Login" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="role" value="Consumer" />
-                    <div class="mb-3 text-start">
-                        <label class="form-label" for="consumerId">Select Consumer</label>
-                        <select class="form-select" id="consumerId" name="consumerId" required>
-                            <option value="">Choose...</option>
-                            @if (ViewBag.Consumers != null)
-                            {
-                                @foreach (var consumer in (IEnumerable<StockBite.Models.Consumer>)ViewBag.Consumers)
-                                {
-                                    <option value="@consumer.Id">@consumer.Name</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3 text-start">
-                        <label class="form-label" for="consumerPassword">Password</label>
-                        <input type="password" class="form-control" id="consumerPassword" name="password" placeholder="xyzpass" required />
-                    </div>
-                    <button type="submit" class="btn btn-lg btn-block btn-warning">Continue as Consumer</button>
-                </form>
-                <a asp-controller="Consumer" asp-action="Index" class="btn btn-sm btn-link mt-2">Go to Consumer Dashboard</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger mt-3" role="alert">
-        @TempData["ErrorMessage"]
-    </div>
-}
+</section>

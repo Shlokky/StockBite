@@ -1,30 +1,170 @@
-﻿@model IEnumerable<StockBite.Models.Vendor>
+﻿@model StockBite.ViewModels.ConsumerDashboardViewModel
+@using StockBite.Helpers
 
 @{
-    ViewData["Title"] = "Vendors";
+    ViewData["Title"] = "Consumer Dashboard";
+    var productCount = Model?.Products?.Count ?? 0;
+    var categories = ViewBag.Categories as List<string> ?? new List<string> { "All" };
+    var selectedCategory = (ViewBag.SelectedCategory as string) ?? "All";
 }
 
-<h1>Vendors</h1>
-
-<p>
-    <a asp-action="Create">Create New Vendor</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Consumer Dashboard</h1>
+        <p class="page-subtitle">Browse items, compare offers, and manage your cart.</p>
+        @if (!string.IsNullOrWhiteSpace(Model.ConsumerName))
         {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                </td>
-            </tr>
+            <div class="small mt-1">User: @Model.ConsumerName</div>
+            @if (!string.IsNullOrWhiteSpace(Model.ConsumerCode))
+            {
+                <div class="small tracking-code-text">Tracking Code: <strong>@Model.ConsumerCode</strong></div>
+            }
         }
-    </tbody>
-</table>
+    </div>
+    <a asp-action="Cart" class="btn btn-warning btn-sm">View Cart</a>
+</div>
+
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Products Shown</div>
+        <div class="metric-value">@productCount</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Mode</div>
+        <div class="metric-value">Shopping</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Order Type</div>
+        <div class="metric-value">Live</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Section</div>
+        <div class="metric-value">Consumer</div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        @if (Model.RecommendedProducts.Any())
+        {
+            <div class="card app-card mb-3">
+                <div class="card-body">
+                    <h5 class="mb-3">Recommended For You</h5>
+                    <div class="recommend-list">
+                        @foreach (var item in Model.RecommendedProducts)
+                        {
+                            <a asp-action="AddToCart" asp-route-id="@item.Id" class="recommend-item">
+                                <img src="@ProductDisplayHelper.GetImageUrl(item.Name)" alt="@item.Name" class="recommend-photo" />
+                                <div>
+                                    <strong>@item.Name</strong>
+                                    <div class="small">Buy by @ProductDisplayHelper.GetUnit(item.Name)</div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.PriorityProducts.Any())
+        {
+            <div class="card app-card mb-3">
+                <div class="card-body">
+                    <h5 class="mb-3">Order These As Priority</h5>
+                    <div class="stock-list">
+                        @foreach (var item in Model.PriorityProducts)
+                        {
+                            <div class="stock-item">
+                                <strong>@item.ProductName</strong>
+                                <span>Left: @item.RemainingQuantity @item.UnitLabel</span>
+                                <span class="warning-text">@item.ExpiryText</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.CurrentStock.Any())
+        {
+            <div class="card app-card mb-3">
+                <div class="card-body">
+                    <h5 class="mb-3">Items In Your Inventory</h5>
+                    <div class="stock-list">
+                        @foreach (var item in Model.CurrentStock)
+                        {
+                            <div class="stock-item">
+                                <strong>@item.ProductName</strong>
+                                <span>Ordered: @item.Quantity @item.UnitLabel</span>
+                                <span>Left: @item.RemainingQuantity @item.UnitLabel</span>
+                                <span class="@(item.IsExpiringSoon ? "stock-expiry warning-text" : "stock-expiry")">@item.ExpiryText</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card app-card mb-3">
+            <div class="card-body py-2">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="small text-muted me-1">Filter:</span>
+                    @foreach (var category in categories)
+                    {
+                        var btnClass = category.Equals(selectedCategory, StringComparison.OrdinalIgnoreCase)
+                        ? "btn btn-sm btn-primary"
+                        : "btn btn-sm btn-outline-primary";
+                        <a asp-action="Index" asp-route-category="@category" class="@btnClass">@category</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="product-grid">
+            @foreach (var item in Model.Products)
+            {
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="@ProductDisplayHelper.GetImageUrl(item.Name)" alt="@item.Name" class="product-photo" />
+                    </div>
+                    <div class="product-body">
+                        <h5>@item.Name</h5>
+                        <p>@item.Description</p>
+                        <div class="product-unit">Sold in @ProductDisplayHelper.GetUnit(item.Name)</div>
+                        <a asp-action="AddToCart" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Add to Cart</a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!Model.Products.Any())
+        {
+            <div class="alert alert-info mt-3">No products found for this category.</div>
+        }
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder().withUrl("/stockHub").build();
+        connection.on("inventoryUpdated", () => location.reload());
+        connection.start().catch(err => console.error(err));
+    </script>
+}

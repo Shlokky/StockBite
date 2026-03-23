@@ -2,25 +2,25 @@
     ViewData["Title"] = "Trigger Natural Calamity";
 }
 
-<h1>Trigger Natural Calamity</h1>
+<h1 class="mb-2">Trigger Natural Calamity</h1>
+<p class="text-muted">Select a product to simulate market disruption and price impact.</p>
 
-<p>Select a product to simulate a natural disaster affecting its supply.</p>
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="NaturalCalamity" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label for="productId" class="control-label">Select Product</label>
-                <select id="productId" name="productId" class="form-control" asp-items="@(ViewData["ProductId"] as SelectList)"></select>
+<div class="row justify-content-start">
+    <div class="col-md-7 col-lg-5">
+        <div class="card app-card">
+            <div class="card-body">
+                <form asp-action="NaturalCalamity" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="mb-3">
+                        <label for="productId" class="form-label">Select Product</label>
+                        <select id="productId" name="productId" class="form-select" asp-items="@(ViewData["ProductId"] as SelectList)"></select>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <input type="submit" value="Trigger Calamity" class="btn btn-danger" />
+                        <a asp-action="Dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group mt-2">
-                <input type="submit" value="Trigger Calamity" class="btn btn-danger" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Dashboard">Back to Admin Dashboard</a>
 </div>

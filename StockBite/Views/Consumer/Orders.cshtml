@@ -1,45 +1,92 @@
 ﻿@model IEnumerable<StockBite.Models.Order>
+@using StockBite.Helpers
 
 @{
     ViewData["Title"] = "My Orders";
+    var orderCount = Model?.Count() ?? 0;
+    var consumerCode = ViewBag.ConsumerCode as string ?? "";
 }
 
-<h1>My Orders</h1>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Orders</h1>
+        <p class="page-subtitle">Track placed orders and approval status.</p>
+    </div>
+    <span class="badge text-bg-info px-3 py-2">Orders: @orderCount</span>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Vendor</th>
-            <th>Quantity</th>
-            <th>Total Price</th>
-            <th>Status</th>
-            <th>Placed</th>
-            <th>Approved</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        <div>@TempData["SuccessMessage"]</div>
+        @if (!string.IsNullOrWhiteSpace(TempData["GuestCode"] as string))
         {
-            <tr>
-                <td>@item.Product.Name</td>
-                <td>@item.Vendor.Name</td>
-                <td>@item.Quantity</td>
-                <td>@item.TotalPrice</td>
-                <td>@item.Status</td>
-                <td>@item.OrderDate</td>
-                <td>@(item.ApprovedAt?.ToString() ?? "-")</td>
-            </tr>
+            <div class="mt-2 tracking-code-text"><strong>Your tracking code:</strong> @TempData["GuestCode"]</div>
+            <div class="small mt-1">Use this code later from the Consumer / User page to open your existing orders.</div>
         }
-    </tbody>
-</table>
-
-@section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
-    <script>
-        const connection = new signalR.HubConnectionBuilder().withUrl("/stockHub").build();
-        connection.on("ordersUpdated", () => location.reload());
-        connection.start().catch(err => console.error(err));
-    </script>
+    </div>
 }
 
+@if (!string.IsNullOrWhiteSpace(consumerCode))
+{
+    <div class="alert tracking-code-box" role="alert">
+        <strong>Tracking Code:</strong> @consumerCode
+    </div>
+}
+
+<div class="card app-card">
+    <div class="card-body p-0">
+        <table class="table table-striped table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Vendor</th>
+                    <th>Placed By</th>
+                    <th>Delivery</th>
+                    <th>Payment</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Placed</th>
+                    <th>Approved</th>
+                    <th>Delivered</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Product.Name</td>
+                        <td>@item.Vendor.Name</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.DeliveryAddress</td>
+                        <td>@item.PaymentMethod</td>
+                        <td>@ProductDisplayHelper.GetQuantityText(item.Quantity, item.Product.Name)</td>
+                        <td>@item.TotalPrice.ToString("C")</td>
+                        <td>
+                            @if (item.Status == StockBite.Models.OrderStatus.Pending)
+                            {
+                                <span class="badge text-bg-warning">Pending</span>
+                            }
+                            else if (item.Status == StockBite.Models.OrderStatus.Approved)
+                            {
+                                <span class="badge text-bg-primary">Approved</span>
+                            }
+                            else if (item.Status == StockBite.Models.OrderStatus.Delivered)
+                            {
+                                <span class="badge text-bg-success">Delivered</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-secondary">@item.Status</span>
+                            }
+                        </td>
+                        <td>@item.OrderDate.ToString("g")</td>
+                        <td>@(item.ApprovedAt?.ToString("g") ?? "-")</td>
+                        <td>@(item.DeliveredAt?.ToString("g") ?? "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

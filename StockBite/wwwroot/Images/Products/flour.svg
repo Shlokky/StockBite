@@ -1,0 +1,8 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+  <rect width="400" height="260" fill="#4b3721"/>
+  <path d="M120 70h160l-16 120H136z" fill="#efe1c8"/>
+  <rect x="146" y="95" width="108" height="26" rx="8" fill="#c78b4d"/>
+  <rect x="146" y="130" width="108" height="12" rx="6" fill="#d3bc95"/>
+  <rect x="146" y="148" width="108" height="12" rx="6" fill="#d3bc95"/>
+  <text x="200" y="228" text-anchor="middle" fill="#fff5e8" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Flour</text>
+</svg>

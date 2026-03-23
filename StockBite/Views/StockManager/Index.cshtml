@@ -2,33 +2,58 @@
 
 @{
     ViewData["Title"] = "Stock Manager - Select Product";
+    var totalProducts = Model?.Count() ?? 0;
 }
 
-<h1>Stock Manager - Select Product</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="page-title">Stock Manager Dashboard</h1>
+        <p class="page-subtitle">Compare vendors quickly and process pending procurement decisions.</p>
+    </div>
+    <a asp-action="PendingOrders" class="btn btn-warning btn-sm">View Pending Orders</a>
+</div>
 
-<p>Select a product to compare vendor prices and availability.</p>
-<p>
-    <a asp-action="PendingOrders" class="btn btn-sm btn-warning">View Pending Orders</a>
-</p>
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Products Available</div>
+        <div class="metric-value">@totalProducts</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Primary Action</div>
+        <div class="metric-value">Compare</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Order Queue</div>
+        <div class="metric-value">Pending</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Panel</div>
+        <div class="metric-value">Stock</div>
+    </div>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th>@Html.DisplayNameFor(model => model.Description)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                <td>
-                    <a asp-action="CompareVendors" asp-route-id="@item.Id">Compare Vendors</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card app-card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.Description)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                        <td>
+                            <a asp-action="CompareVendors" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Compare Vendors</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

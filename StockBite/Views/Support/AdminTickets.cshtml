@@ -1,0 +1,68 @@
+﻿@model IEnumerable<StockBite.Models.SupportTicket>
+
+@{
+    ViewData["Title"] = "Customer Tickets";
+    var ticketCount = Model?.Count() ?? 0;
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Customer Tickets</h1>
+        <p class="page-subtitle">Check support issues and reply to customers.</p>
+    </div>
+    <span class="badge text-bg-warning px-3 py-2">Count: @ticketCount</span>
+</div>
+
+<div class="card app-card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="ticket-list">
+                @foreach (var item in Model)
+                {
+                    <div class="ticket-item">
+                        <div class="d-flex justify-content-between gap-3 mb-2">
+                            <div>
+                                <strong>Ticket #@item.Id - @item.Subject</strong>
+                                <div class="small">@item.CustomerName | @item.CustomerEmail</div>
+                                <div class="small">Created: @item.CreatedAt.ToString("g")</div>
+                            </div>
+                            <span class="badge @(item.IsResolved ? "text-bg-success" : "text-bg-warning")">@(item.IsResolved ? "Resolved" : "Open")</span>
+                        </div>
+                        <p class="mb-3">@item.Message</p>
+                        <div class="ticket-reply mb-3">
+                            <strong>Current Reply:</strong>
+                            <div>@(string.IsNullOrWhiteSpace(item.AdminReply) ? "No reply yet." : item.AdminReply)</div>
+                        </div>
+                        <form asp-action="Reply" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <div class="mb-2">
+                                <textarea class="form-control" name="adminReply" rows="3" placeholder="Write your reply here"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary">Send Reply</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mb-0">No customer tickets yet.</div>
+        }
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}

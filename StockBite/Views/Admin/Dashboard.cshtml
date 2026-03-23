@@ -2,7 +2,13 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<h1>Admin Dashboard</h1>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Admin Dashboard</h1>
+        <p class="page-subtitle">Manage products, vendors, order flow, and simulation controls.</p>
+    </div>
+    <span class="badge text-bg-dark px-3 py-2">Admin Panel</span>
+</div>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -12,41 +18,81 @@
     </div>
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Product Management</h2>
-        <ul>
-            <li><a asp-controller="Products" asp-action="Index">View All Products</a></li>
-            <li><a asp-controller="Products" asp-action="Create">Add New Product</a></li>
-        </ul>
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Products</div>
+        <div class="metric-value">Manage</div>
     </div>
-    <div class="col-md-4">
-        <h2>Vendor Management</h2>
-        <ul>
-            <li><a asp-controller="AdminVendors" asp-action="Index">View All Vendors</a></li>
-            <li><a asp-controller="AdminVendors" asp-action="Create">Add New Vendor</a></li>
-        </ul>
+    <div class="metric-card">
+        <div class="metric-label">Vendors</div>
+        <div class="metric-value">Manage</div>
     </div>
-    <div class="col-md-4">
-        <h2>Vendor-Product Relationships</h2>
-        <ul>
-            <li><a asp-controller="VendorProducts" asp-action="Index">View Vendor-Product Links</a></li>
-            <li><a asp-controller="VendorProducts" asp-action="Create">Create Vendor-Product Link</a></li>
-        </ul>
+    <div class="metric-card">
+        <div class="metric-label">Orders</div>
+        <div class="metric-value">Monitor</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Simulation</div>
+        <div class="metric-value">Calamity</div>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <h2>System Orders</h2>
-        <ul>
-            <li><a asp-controller="Orders" asp-action="Index">View All Orders</a></li>
-        </ul>
+<div class="row g-3">
+    <div class="col-md-6 col-lg-4">
+        <div class="card app-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Product Management</h5>
+                <p class="text-muted small">Create and maintain your product catalog.</p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-sm btn-outline-primary me-2">View Products</a>
+                <a asp-controller="Products" asp-action="Create" class="btn btn-sm btn-primary">Add Product</a>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Simulation</h2>
-        <ul>
-            <li><a asp-controller="Admin" asp-action="NaturalCalamity">Trigger Natural Calamity</a></li>
-        </ul>
+    <div class="col-md-6 col-lg-4">
+        <div class="card app-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Vendor Management</h5>
+                <p class="text-muted small">Add vendors and keep supplier details updated.</p>
+                <a asp-controller="AdminVendors" asp-action="Index" class="btn btn-sm btn-outline-primary me-2">View Vendors</a>
+                <a asp-controller="AdminVendors" asp-action="Create" class="btn btn-sm btn-primary">Add Vendor</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card app-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Vendor-Product Links</h5>
+                <p class="text-muted small">Connect products with vendor pricing offers.</p>
+                <a asp-controller="VendorProducts" asp-action="Index" class="btn btn-sm btn-outline-primary me-2">View Links</a>
+                <a asp-controller="VendorProducts" asp-action="Create" class="btn btn-sm btn-primary">Create Link</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card app-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">System Orders</h5>
+                <p class="text-muted small">Review all purchase orders and status updates.</p>
+                <a asp-controller="Orders" asp-action="Index" class="btn btn-sm btn-outline-primary">View Orders</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card app-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Customer Tickets</h5>
+                <p class="text-muted small">Read support tickets and reply to customer questions.</p>
+                <a asp-controller="Support" asp-action="AdminTickets" class="btn btn-sm btn-outline-primary">View Tickets</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card app-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Simulation</h5>
+                <p class="text-muted small">Test market volatility with one click.</p>
+                <a asp-controller="Admin" asp-action="NaturalCalamity" class="btn btn-sm btn-outline-danger">Trigger Calamity</a>
+            </div>
+        </div>
     </div>
 </div>

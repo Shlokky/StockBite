@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+  <rect width="400" height="260" fill="#4a2d17"/>
+  <path d="M100 150c0-34 32-62 100-62s100 28 100 62v24H100z" fill="#d3914c"/>
+  <path d="M100 150c0-34 32-62 100-62s100 28 100 62" fill="none" stroke="#f1c58b" stroke-width="14" stroke-linecap="round"/>
+  <path d="M132 128c12 8 26 8 38 0M182 116c12 8 26 8 38 0M232 128c12 8 26 8 38 0" fill="none" stroke="#8b5627" stroke-width="6" stroke-linecap="round"/>
+  <text x="200" y="228" text-anchor="middle" fill="#fff2e3" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Bakery</text>
+</svg>

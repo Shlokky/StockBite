@@ -1,0 +1,8 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+  <rect width="400" height="260" fill="#25360f"/>
+  <rect x="145" y="68" width="110" height="118" rx="18" fill="#f2d45b"/>
+  <rect x="173" y="44" width="54" height="28" rx="8" fill="#e4edf7"/>
+  <rect x="185" y="32" width="30" height="18" rx="5" fill="#cdd8e6"/>
+  <path d="M200 102c20 24 29 39 29 52a29 29 0 1 1-58 0c0-13 9-28 29-52z" fill="#fff4ae"/>
+  <text x="200" y="228" text-anchor="middle" fill="#f8fbeb" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Cooking Oil</text>
+</svg>

@@ -1,0 +1,8 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+  <rect width="400" height="260" fill="#3d1620"/>
+  <path d="M90 155c0-42 39-78 96-78 39 0 78 16 102 48 18 24 21 59-4 84-24 24-64 27-101 27-60 0-93-31-93-81z" fill="#d25b6c"/>
+  <path d="M129 153c0-24 25-44 58-44 25 0 52 9 67 29 13 18 11 43-7 57-14 11-31 13-52 13-42 0-66-20-66-55z" fill="#f0b4be"/>
+  <circle cx="109" cy="112" r="18" fill="#f2ece4"/>
+  <circle cx="109" cy="112" r="9" fill="#e2d6ca"/>
+  <text x="200" y="228" text-anchor="middle" fill="#fdeff2" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Meat Items</text>
+</svg>

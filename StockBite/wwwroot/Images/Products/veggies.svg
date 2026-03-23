@@ -1,0 +1,9 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260">
+  <rect width="400" height="260" fill="#173426"/>
+  <circle cx="95" cy="125" r="46" fill="#7ed957"/>
+  <circle cx="165" cy="105" r="34" fill="#62c44f"/>
+  <circle cx="215" cy="145" r="42" fill="#8fe46b"/>
+  <circle cx="285" cy="118" r="38" fill="#6bd05b"/>
+  <rect x="70" y="178" width="260" height="18" rx="9" fill="#c88a43"/>
+  <text x="200" y="232" text-anchor="middle" fill="#f1f7ec" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Fresh Vegetables</text>
+</svg>

@@ -1,0 +1,87 @@
+﻿@model StockBite.ViewModels.SupportPageViewModel
+
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Contact Us</h1>
+        <p class="page-subtitle">Create a support ticket and the admin can reply to help you.</p>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card app-card">
+            <div class="card-body">
+                <h5 class="mb-3">Create Ticket</h5>
+                <form asp-action="ContactUs" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label" for="CustomerName">Name</label>
+                        <input class="form-control" id="CustomerName" name="CustomerName" value="@Model.CustomerName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="CustomerEmail">Email</label>
+                        <input class="form-control" id="CustomerEmail" name="CustomerEmail" value="@Model.CustomerEmail" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="Subject">Subject</label>
+                        <input class="form-control" id="Subject" name="Subject" value="@Model.Subject" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="Message">Message</label>
+                        <textarea class="form-control" id="Message" name="Message" rows="5">@Model.Message</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Ticket</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card app-card">
+            <div class="card-body">
+                <h5 class="mb-3">Your Tickets</h5>
+                @if (Model.Tickets.Any())
+                {
+                    <div class="ticket-list">
+                        @foreach (var item in Model.Tickets)
+                        {
+                            <div class="ticket-item">
+                                <div class="d-flex justify-content-between gap-3 mb-2">
+                                    <strong>@item.Subject</strong>
+                                    <span class="badge @(item.IsResolved ? "text-bg-success" : "text-bg-warning")">@(item.IsResolved ? "Replied" : "Open")</span>
+                                </div>
+                                <div class="small mb-2">Created: @item.CreatedAt.ToString("g")</div>
+                                <p class="mb-2">@item.Message</p>
+                                <div class="ticket-reply">
+                                    <strong>Admin Reply:</strong>
+                                    <div>@(string.IsNullOrWhiteSpace(item.AdminReply) ? "No reply yet." : item.AdminReply)</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info mb-0">No tickets yet. Create one from the form.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}

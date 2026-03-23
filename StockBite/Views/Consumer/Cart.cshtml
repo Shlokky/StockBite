@@ -1,57 +1,96 @@
 ﻿@model StockBite.ViewModels.CartViewModel
+@using StockBite.Helpers
 
 @{
     ViewData["Title"] = "Cart";
+    var lineCount = Model?.Lines?.Count ?? 0;
 }
 
-<h1>Cart</h1>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Cart</h1>
+        <p class="page-subtitle">Review selected items and complete checkout.</p>
+    </div>
+    <span class="badge text-bg-warning px-3 py-2">Items: @lineCount</span>
+</div>
 
 @if (Model.Lines.Count == 0)
 {
-    <p>Your cart is empty.</p>
-    <a asp-action="Index" class="btn btn-link">Back to Products</a>
+    <div class="card app-card">
+        <div class="card-body">
+            <p class="mb-2">Your cart is empty.</p>
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm">Back to Products</a>
+        </div>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Vendor</th>
-                <th>Unit Price</th>
-                <th>Quantity</th>
-                <th>Line Total</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var line in Model.Lines)
-            {
-                <tr>
-                    <td>@line.ProductName</td>
-                    <td>@line.VendorName</td>
-                    <td>@line.UnitPrice</td>
-                    <td>
-                        <form asp-action="UpdateCart" method="post" class="d-flex gap-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="vendorProductId" value="@line.VendorProductId" />
-                            <input type="number" name="quantity" min="0" value="@line.Quantity" class="form-control form-control-sm" style="width: 100px;" />
-                            <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
-                        </form>
-                    </td>
-                    <td>@line.LineTotal</td>
-                    <td></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card app-card mb-3">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Vendor</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th>Line Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in Model.Lines)
+                    {
+                        <tr>
+                            <td>@line.ProductName</td>
+                            <td>@line.VendorName</td>
+                            <td>@($"{line.UnitPrice:C} / {line.UnitLabel}")</td>
+                            <td>
+                                <form asp-action="UpdateCart" method="post" class="d-flex gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="vendorProductId" value="@line.VendorProductId" />
+                                    <input type="number" name="quantity" min="0" value="@line.Quantity" class="form-control form-control-sm" style="width: 100px;" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+                                </form>
+                                <div class="small mt-1">@line.UnitLabel</div>
+                            </td>
+                            <td>@line.LineTotal.ToString("C")</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <div class="d-flex justify-content-between align-items-center">
-        <strong>Total: @Model.Total</strong>
-        <form asp-action="Checkout" method="post">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-success">Checkout</button>
-        </form>
+        <strong>Total: @Model.Total.ToString("C")</strong>
+    </div>
+    <div class="card app-card mt-3">
+        <div class="card-body">
+            <h5 class="mb-3">Checkout Details</h5>
+            <form asp-action="Checkout" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label class="form-label" for="customerName">Who is placing the order?</label>
+                    <input type="text" class="form-control" id="customerName" name="customerName" value="@Model.CustomerName" placeholder="Enter your name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="deliveryAddress">Where to deliver?</label>
+                    <textarea class="form-control" id="deliveryAddress" name="deliveryAddress" rows="3" placeholder="Enter delivery address">@Model.DeliveryAddress</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="paymentMethod">How will you pay?</label>
+                    <select class="form-select" id="paymentMethod" name="paymentMethod">
+                        <option value="">Select payment method</option>
+                        <option value="Cash on Delivery" selected="@(Model.PaymentMethod == "Cash on Delivery")">Cash on Delivery</option>
+                        <option value="Card" selected="@(Model.PaymentMethod == "Card")">Card</option>
+                        <option value="Online Transfer" selected="@(Model.PaymentMethod == "Online Transfer")">Online Transfer</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Place Order</button>
+            </form>
+        </div>
     </div>
     <a asp-action="Index" class="btn btn-link mt-2">Continue Shopping</a>
 }
@@ -78,4 +117,3 @@ else
         connection.start().catch(err => console.error(err));
     </script>
 }
-

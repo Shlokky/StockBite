@@ -2,29 +2,61 @@
 
 @{
     ViewData["Title"] = "Vendors";
+    var totalVendors = Model?.Count() ?? 0;
 }
 
-<h1>Vendors</h1>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Admin Vendors</h1>
+        <p class="page-subtitle">Track vendor details and open vendor profiles.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">Create New Vendor</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New Vendor</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Total Vendors</div>
+        <div class="metric-value">@totalVendors</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Section</div>
+        <div class="metric-value">Suppliers</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Mode</div>
+        <div class="metric-value">Admin</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Action</div>
+        <div class="metric-value">Review</div>
+    </div>
+</div>
+
+<div class="card app-card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Name)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-3">No vendors added yet. Create a vendor to continue.</div>
+}
