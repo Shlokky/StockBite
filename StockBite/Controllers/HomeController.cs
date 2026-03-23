@@ -3,7 +3,6 @@ using StockBite.Data;
 using StockBite.Models;
 using StockBite.Services;
 using System.Diagnostics;
-
 namespace StockBite.Controllers
 {
     public class HomeController : Controller

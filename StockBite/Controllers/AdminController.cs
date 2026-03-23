@@ -4,7 +4,6 @@ using StockBite.Controllers;
 using StockBite.Data;
 using StockBite.Models;
 using StockBite.Services;
-
 namespace StockBite.Controllers
 {
     public class AdminController : BaseController
