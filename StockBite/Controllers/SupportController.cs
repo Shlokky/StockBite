@@ -1,71 +1,67 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using StockBite.Controllers;
 using StockBite.Data;
 using StockBite.Models;
 using StockBite.Services;
+using StockBite.ViewModels;
 
 namespace StockBite.Controllers
 {
     public class SupportController : BaseController
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _db;
 
-        public SupportController(ApplicationDbContext dbContext, IRoleContext roleContext)
-            : base(roleContext)
+        public SupportController(ApplicationDbContext db, IRoleContext roleContext) :
+base(roleContext)
         {
-            _dbContext = dbContext;
+            _db = db;
         }
 
         public IActionResult ContactUs()
         {
-            var model = BuildSupportPageViewModel();
-            return View(model);
+            return View(new SupportPageViewModel
+            {
+                CustomerName = GetCustomerName(),
+                Tickets = GetMyTickets()
+            });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ContactUs(SupportPageViewModel model)
         {
-            model.CustomerName = (model.CustomerName ?? "").Trim();
-            model.CustomerEmail = (model.CustomerEmail ?? "").Trim();
-            model.Subject = (model.Subject ?? "").Trim();
-            model.Message = (model.Message ?? "").Trim();
+            model.CustomerName = Clean(model.CustomerName);
+            model.CustomerEmail = Clean(model.CustomerEmail);
+            model.Subject = Clean(model.Subject);
+            model.Message = Clean(model.Message);
 
-            if (string.IsNullOrWhiteSpace(model.CustomerName) ||
-                string.IsNullOrWhiteSpace(model.CustomerEmail) ||
-                string.IsNullOrWhiteSpace(model.Subject) ||
-                string.IsNullOrWhiteSpace(model.Message))
+            if (model.CustomerName == "" || model.CustomerEmail == "" || model.Subject == "" ||
+model.Message == "")
             {
                 TempData["ErrorMessage"] = "Fill in all ticket details.";
-                model.Tickets = GetVisibleTickets();
+                model.Tickets = GetMyTickets();
                 return View(model);
             }
 
-            var ticket = new SupportTicket
+            _db.SupportTickets.Add(new SupportTicket
             {
                 ConsumerId = CurrentConsumerId,
                 CustomerName = model.CustomerName,
                 CustomerEmail = model.CustomerEmail,
                 Subject = model.Subject,
                 Message = model.Message
-            };
+            });
 
-            _dbContext.SupportTickets.Add(ticket);
-            _dbContext.SaveChanges();
-
+            _db.SaveChanges();
             TempData["SuccessMessage"] = "Your ticket has been created.";
             return RedirectToAction(nameof(ContactUs));
         }
 
         public IActionResult AdminTickets()
         {
-            if (!IsAuthorized(UserRole.Admin))
-            {
-                return RedirectToUnauthorized();
-            }
+            if (!IsAuthorized(UserRole.Admin)) return RedirectToUnauthorized();
 
-            var tickets = _dbContext.SupportTickets
+            var tickets = _db.SupportTickets
                 .Include(x => x.Consumer)
                 .OrderBy(x => x.IsResolved)
                 .ThenByDescending(x => x.CreatedAt)
@@ -78,19 +74,13 @@ namespace StockBite.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Reply(int id, string adminReply)
         {
-            if (!IsAuthorized(UserRole.Admin))
-            {
-                return RedirectToUnauthorized();
-            }
+            if (!IsAuthorized(UserRole.Admin)) return RedirectToUnauthorized();
 
-            var ticket = _dbContext.SupportTickets.FirstOrDefault(x => x.Id == id);
-            if (ticket == null)
-            {
-                return NotFound();
-            }
+            var ticket = _db.SupportTickets.FirstOrDefault(x => x.Id == id);
+            if (ticket == null) return NotFound();
 
-            adminReply = (adminReply ?? "").Trim();
-            if (string.IsNullOrWhiteSpace(adminReply))
+            adminReply = Clean(adminReply);
+            if (adminReply == "")
             {
                 TempData["ErrorMessage"] = "Reply cannot be empty.";
                 return RedirectToAction(nameof(AdminTickets));
@@ -99,45 +89,35 @@ namespace StockBite.Controllers
             ticket.AdminReply = adminReply;
             ticket.IsResolved = true;
             ticket.RepliedAt = DateTime.Now;
-            _dbContext.SaveChanges();
 
+            _db.SaveChanges();
             TempData["SuccessMessage"] = $"Reply sent for ticket #{ticket.Id}.";
             return RedirectToAction(nameof(AdminTickets));
         }
 
-        private SupportPageViewModel BuildSupportPageViewModel()
+        private string GetCustomerName()
         {
-            return new SupportPageViewModel
-            {
-                CustomerName = GetDefaultCustomerName(),
-                Tickets = GetVisibleTickets()
-            };
-        }
+            if (!CurrentConsumerId.HasValue) return "";
 
-        private string GetDefaultCustomerName()
-        {
-            if (!CurrentConsumerId.HasValue)
-            {
-                return "";
-            }
-
-            return _dbContext.Consumers
+            return _db.Consumers
                 .Where(x => x.Id == CurrentConsumerId.Value)
                 .Select(x => x.Name)
                 .FirstOrDefault() ?? "";
         }
 
-        private List<SupportTicket> GetVisibleTickets()
+        private List<SupportTicket> GetMyTickets()
         {
-            if (!CurrentConsumerId.HasValue)
-            {
-                return new List<SupportTicket>();
-            }
+            if (!CurrentConsumerId.HasValue) return new List<SupportTicket>();
 
-            return _dbContext.SupportTickets
+            return _db.SupportTickets
                 .Where(x => x.ConsumerId == CurrentConsumerId.Value)
                 .OrderByDescending(x => x.CreatedAt)
                 .ToList();
+        }
+
+        private static string Clean(string? text)
+        {
+            return (text ?? "").Trim();
         }
     }
 }
