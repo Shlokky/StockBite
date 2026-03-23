@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace StockBitePrototype.Services
+namespace StockBite.Services
 {
     public static class SessionExtensions
     {
