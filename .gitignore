@@ -11,3 +11,7 @@
 *.db
 *.db-wal
 
+
+.vs/
+bin/
+obj/

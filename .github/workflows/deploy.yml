@@ -1,35 +1,34 @@
- name: Deploy StockBite to Somee
+name: Deploy StockBite to Somee
 
-  on:
-    push:
-      branches:
-        - main
+on:
+  push:
+    branches:
+      - main
 
-  jobs:
-    build-and-deploy:
-      runs-on: windows-latest
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v4
-          with:
-            dotnet-version: 8.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-        - name: Restore
-          run: dotnet restore
+      - name: Restore
+        run: dotnet restore
 
-        - name: Publish
-          run: dotnet publish ./StockBite/StockBite.csproj -c
-  Release -o ./publish
+      - name: Publish
+        run: dotnet publish ./StockBite/StockBite.csproj -c Release -o ./publish
 
-        - name: Deploy via FTP
-          uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-          with:
-            server: ${{ secrets.FTP_SERVER }}
-            username: ${{ secrets.FTP_USERNAME }}
-            password: ${{ secrets.FTP_PASSWORD }}
-            local-dir: ./publish/
-            server-dir: /www.Stockbite.somee.com/
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /www.Stockbite.somee.com/
