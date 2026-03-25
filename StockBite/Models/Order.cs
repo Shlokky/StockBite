@@ -13,8 +13,12 @@ namespace StockBite.Models
         public Vendor Vendor { get; set; } = null!;
         public int Quantity { get; set; }
         public decimal TotalPrice { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public string DeliveryAddress { get; set; } = string.Empty;
+        public string PaymentMethod { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public DateTime? ApprovedAt { get; set; }
+        public DateTime? DeliveredAt { get; set; }
     }
 }

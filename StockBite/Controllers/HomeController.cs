@@ -1,8 +1,10 @@
+
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using StockBite.Data;
 using StockBite.Models;
 using StockBite.Services;
-using System.Diagnostics;
+
 namespace StockBite.Controllers
 {
     public class HomeController : Controller
@@ -143,6 +145,7 @@ namespace StockBite.Controllers
         public IActionResult Logout()
         {
             ResetUserContext();
+            HttpContext.Session.Clear();
             return RedirectToAction(nameof(Index));
         }
 
@@ -157,7 +160,10 @@ namespace StockBite.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
 
         private bool TryGetSupportedRole(string? role, out UserRole userRole)

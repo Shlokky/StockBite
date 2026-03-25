@@ -5,6 +5,8 @@ using StockBite.Controllers;
 using StockBite.Data;
 using StockBite.Models;
 using StockBite.Services;
+
+
 namespace StockBite.Controllers
 {
     public class VendorProductsController : BaseController
@@ -49,6 +51,14 @@ namespace StockBite.Controllers
             {
                 return RedirectToUnauthorized();
             }
+            ModelState.Remove(nameof(VendorProduct.Vendor));
+            ModelState.Remove(nameof(VendorProduct.Product));
+
+            if (_dbContext.VendorProducts.Any(vp => vp.VendorId == vendorProduct.VendorId && vp.ProductId == vendorProduct.ProductId))
+            {
+                ModelState.AddModelError(string.Empty, "This vendor-product relationship already exists.");
+            }
+
             if (ModelState.IsValid)
             {
                 _dbContext.VendorProducts.Add(vendorProduct);

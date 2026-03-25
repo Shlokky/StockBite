@@ -15,6 +15,7 @@ namespace StockBite.Data
         public DbSet<VendorProduct> VendorProducts => Set<VendorProduct>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<Consumer> Consumers => Set<Consumer>();
+        public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,11 +66,29 @@ namespace StockBite.Data
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(o => o.TotalPrice).HasColumnType("decimal(10,2)");
+                entity.Property(o => o.CustomerName).HasMaxLength(200);
+                entity.Property(o => o.DeliveryAddress).HasMaxLength(300);
+                entity.Property(o => o.PaymentMethod).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Consumer>(entity =>
             {
                 entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.GuestCode).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<SupportTicket>(entity =>
+            {
+                entity.Property(e => e.CustomerName).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.CustomerEmail).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.Subject).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.Message).HasMaxLength(1000).IsRequired();
+                entity.Property(e => e.AdminReply).HasMaxLength(1000);
+
+                entity.HasOne(e => e.Consumer)
+                    .WithMany()
+                    .HasForeignKey(e => e.ConsumerId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

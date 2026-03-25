@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using StockBite.Models;
-using StockBite.Services;
 
 namespace StockBite.Services
 {

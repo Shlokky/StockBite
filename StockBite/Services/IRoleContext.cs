@@ -1,6 +1,5 @@
 ﻿using StockBite.Models;
 
-
 namespace StockBite.Services
 {
     public interface IRoleContext
