@@ -1,5 +1,16 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\Images\Products\bakery.svg
+wwwroot\Images\Products\dairy.svg
+wwwroot\Images\Products\flour.svg
+wwwroot\Images\Products\grains.svg
+wwwroot\Images\Products\meat.svg
+wwwroot\Images\Products\oil.svg
+wwwroot\Images\Products\Real\garlic.jpg
+wwwroot\Images\Products\Real\lettuce.jpg
+wwwroot\Images\Products\Real\onions.jpg
+wwwroot\Images\Products\Real\potatoe.jpeg
+wwwroot\Images\Products\veggies.svg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map

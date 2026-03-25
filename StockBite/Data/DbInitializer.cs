@@ -15,6 +15,7 @@ namespace StockBite.Data
                 context.Database.EnsureDeleted();
             }
 
+            
             context.Database.EnsureCreated();
             EnsureOrderColumns(context);
             ClearRuntimeData(context);
