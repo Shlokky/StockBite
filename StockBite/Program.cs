@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using StockBite.Data;
 using StockBite.Hubs;
@@ -26,7 +27,11 @@ var authenticationBuilder = builder.Services
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
-    .AddCookie();
+    .AddCookie(options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
@@ -37,6 +42,16 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
         options.ClientId = googleClientId;
         options.ClientSecret = googleClientSecret;
         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.CallbackPath = "/signin-google";
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Events.OnRemoteFailure = context =>
+        {
+            var message = context.Failure?.Message ?? "Google sign-in failed. Please try again.";
+            context.Response.Redirect($"/Home/ConsumerAccess?externalError={Uri.EscapeDataString(message)}");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 }
 

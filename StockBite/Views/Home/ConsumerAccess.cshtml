@@ -17,6 +17,13 @@
                 </div>
             }
 
+            @if (!string.IsNullOrWhiteSpace(ViewBag.ExternalError as string))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewBag.ExternalError
+                </div>
+            }
+
             @if (TempData["SuccessMessage"] != null)
             {
                 <div class="alert alert-success" role="alert">

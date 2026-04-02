@@ -25,6 +25,21 @@ jobs:
       - name: Publish
         run: dotnet publish ./StockBite/StockBite.csproj -c Release -o ./publish
 
+      - name: Inject Google OAuth settings into published appsettings
+        shell: powershell
+        run: |
+          $path = ".\publish\appsettings.json"
+          $json = Get-Content $path -Raw | ConvertFrom-Json
+          if (-not $json.Authentication) {
+            $json | Add-Member -MemberType NoteProperty -Name Authentication -Value (@{})
+          }
+          if (-not $json.Authentication.Google) {
+            $json.Authentication | Add-Member -MemberType NoteProperty -Name Google -Value (@{})
+          }
+          $json.Authentication.Google.ClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
+          $json.Authentication.Google.ClientSecret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          $json | ConvertTo-Json -Depth 10 | Set-Content $path
+
       - name: Create app_offline file
         shell: powershell
         run: |

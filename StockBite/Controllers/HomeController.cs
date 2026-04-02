@@ -92,9 +92,10 @@ namespace StockBite.Controllers
             return View();
         }
 
-        public IActionResult ConsumerAccess()
+        public IActionResult ConsumerAccess(string? externalError = null)
         {
             ViewBag.GoogleEnabled = IsGoogleConfigured();
+            ViewBag.ExternalError = externalError;
             return View();
         }
 
@@ -157,14 +158,14 @@ namespace StockBite.Controllers
 
         public async Task<IActionResult> ExternalLoginCallback()
         {
-            if (!User.Identity?.IsAuthenticated ?? true)
+            var externalResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = externalResult.Principal ?? User;
+
+            if (principal?.Identity?.IsAuthenticated != true)
             {
                 TempData["ErrorMessage"] = "Google sign-in was not completed.";
                 return RedirectToAction(nameof(ConsumerAccess));
             }
-
-            var externalResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = externalResult.Principal ?? User;
 
             var email = principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue("email");
             var name = principal.FindFirstValue(ClaimTypes.Name) ?? principal.FindFirstValue("name");
