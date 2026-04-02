@@ -36,13 +36,44 @@ jobs:
           if (-not $json.Authentication.Google) {
             $json.Authentication | Add-Member -MemberType NoteProperty -Name Google -Value (@{})
           }
+          if (-not $json.Email) {
+            $json | Add-Member -MemberType NoteProperty -Name Email -Value (@{})
+          }
           $googleClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
           $googleClientSecret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          $emailHost = "${{ secrets.SMTP_HOST }}"
+          $emailPort = "${{ secrets.SMTP_PORT }}"
+          $senderEmail = "${{ secrets.SMTP_SENDER_EMAIL }}"
+          $senderName = "${{ secrets.SMTP_SENDER_NAME }}"
+          $emailUsername = "${{ secrets.SMTP_USERNAME }}"
+          $emailPassword = "${{ secrets.SMTP_PASSWORD }}"
+          $emailEnableSsl = "${{ secrets.SMTP_ENABLE_SSL }}"
           if (-not [string]::IsNullOrWhiteSpace($googleClientId)) {
             $json.Authentication.Google.ClientId = $googleClientId
           }
           if (-not [string]::IsNullOrWhiteSpace($googleClientSecret)) {
             $json.Authentication.Google.ClientSecret = $googleClientSecret
+          }
+          if (-not [string]::IsNullOrWhiteSpace($emailHost)) {
+            $json.Email.Host = $emailHost
+          }
+          if (-not [string]::IsNullOrWhiteSpace($emailPort)) {
+            $json.Email.Port = [int]$emailPort
+          }
+          if (-not [string]::IsNullOrWhiteSpace($senderEmail)) {
+            $json.Email.SenderEmail = $senderEmail
+          }
+          if (-not [string]::IsNullOrWhiteSpace($senderName)) {
+            $json.Email.SenderName = $senderName
+          }
+          if (-not [string]::IsNullOrWhiteSpace($emailUsername)) {
+            $json.Email.Username = $emailUsername
+          }
+          if (-not [string]::IsNullOrWhiteSpace($emailPassword)) {
+            $json.Email.Password = $emailPassword
+          }
+          if (-not [string]::IsNullOrWhiteSpace($emailEnableSsl)) {
+            $json.Email.EnableSsl = [System.Convert]::ToBoolean($emailEnableSsl)
           }
           $json | ConvertTo-Json -Depth 10 | Set-Content $path
 

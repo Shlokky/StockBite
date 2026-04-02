@@ -10,6 +10,7 @@ namespace StockBite.Data
         public static void Initialize(ApplicationDbContext context)
         {
             var shouldResetDatabase = Environment.GetEnvironmentVariable("RESET_STOCKBITE_DB") == "true";
+            var shouldClearRuntimeData = Environment.GetEnvironmentVariable("RESET_STOCKBITE_RUNTIME_DATA") == "true";
 
             if (shouldResetDatabase)
             {
@@ -19,7 +20,11 @@ namespace StockBite.Data
             
             context.Database.EnsureCreated();
             EnsureOrderColumns(context);
-            ClearRuntimeData(context);
+
+            if (shouldClearRuntimeData)
+            {
+                ClearRuntimeData(context);
+            }
 
             var productSeeds = new List<Product>
             {
