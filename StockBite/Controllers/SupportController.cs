@@ -10,11 +10,16 @@ namespace StockBite.Controllers
     public class SupportController : BaseController
     {
         private readonly ApplicationDbContext _db;
+        private readonly SupportTicketReplyService _supportTicketReplyService;
 
-        public SupportController(ApplicationDbContext db, IRoleContext roleContext) :
-base(roleContext)
+        public SupportController(
+            ApplicationDbContext db,
+            IRoleContext roleContext,
+            SupportTicketReplyService supportTicketReplyService)
+            : base(roleContext)
         {
             _db = db;
+            _supportTicketReplyService = supportTicketReplyService;
         }
 
         public IActionResult ContactUs()
@@ -80,19 +85,47 @@ model.Message == "")
             if (ticket == null) return NotFound();
 
             adminReply = Clean(adminReply);
-            if (adminReply == "")
+            if (!_supportTicketReplyService.AddAdminReply(ticket, adminReply))
             {
                 TempData["ErrorMessage"] = "Reply cannot be empty.";
                 return RedirectToAction(nameof(AdminTickets));
             }
 
-            ticket.AdminReply = adminReply;
-            ticket.IsResolved = true;
-            ticket.RepliedAt = DateTime.Now;
-
             _db.SaveChanges();
             TempData["SuccessMessage"] = $"Reply sent for ticket #{ticket.Id}.";
             return RedirectToAction(nameof(AdminTickets));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CustomerReply(SupportReplyViewModel model)
+        {
+            if (!IsAuthorized(UserRole.Consumer))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var ticket = _db.SupportTickets.FirstOrDefault(x => x.Id == model.Id && x.ConsumerId == CurrentConsumerId);
+            if (ticket == null)
+            {
+                return NotFound();
+            }
+
+            if (string.IsNullOrWhiteSpace(ticket.AdminReply))
+            {
+                TempData["ErrorMessage"] = "Wait for the admin reply before sending your follow-up.";
+                return RedirectToAction(nameof(ContactUs));
+            }
+
+            if (!_supportTicketReplyService.AddCustomerReply(ticket, Clean(model.ReplyText)))
+            {
+                TempData["ErrorMessage"] = "Reply cannot be empty.";
+                return RedirectToAction(nameof(ContactUs));
+            }
+
+            _db.SaveChanges();
+            TempData["SuccessMessage"] = $"Reply sent for ticket #{ticket.Id}.";
+            return RedirectToAction(nameof(ContactUs));
         }
 
         private string GetCustomerName()

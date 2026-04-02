@@ -34,6 +34,13 @@
                             <strong>Current Reply:</strong>
                             <div>@(string.IsNullOrWhiteSpace(item.AdminReply) ? "No reply yet." : item.AdminReply)</div>
                         </div>
+                        @if (!string.IsNullOrWhiteSpace(item.CustomerReply))
+                        {
+                            <div class="ticket-reply ticket-reply-customer mb-3">
+                                <strong>Customer Follow-up:</strong>
+                                <div>@item.CustomerReply</div>
+                            </div>
+                        }
                         <form asp-action="Reply" method="post">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@item.Id" />

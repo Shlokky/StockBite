@@ -12,8 +12,10 @@ namespace StockBite.Models
         public string Subject { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public string AdminReply { get; set; } = string.Empty;
+        public string CustomerReply { get; set; } = string.Empty;
         public bool IsResolved { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? RepliedAt { get; set; }
+        public DateTime? CustomerRepliedAt { get; set; }
     }
 }

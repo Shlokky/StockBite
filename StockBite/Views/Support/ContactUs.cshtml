@@ -59,6 +59,24 @@
                                     <strong>Admin Reply:</strong>
                                     <div>@(string.IsNullOrWhiteSpace(item.AdminReply) ? "No reply yet." : item.AdminReply)</div>
                                 </div>
+                                @if (!string.IsNullOrWhiteSpace(item.CustomerReply))
+                                {
+                                    <div class="ticket-reply ticket-reply-customer mt-2">
+                                        <strong>Your Last Reply:</strong>
+                                        <div>@item.CustomerReply</div>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(item.AdminReply))
+                                {
+                                    <form asp-action="CustomerReply" method="post" class="mt-3">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Id" value="@item.Id" />
+                                        <div class="mb-2">
+                                            <textarea class="form-control" name="ReplyText" rows="3" placeholder="Write your reply back to the admin"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-outline-light">Reply To Ticket</button>
+                                    </form>
+                                }
                             </div>
                         }
                     </div>

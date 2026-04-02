@@ -178,10 +178,20 @@ namespace StockBite.Data
                         Subject nvarchar(200) NOT NULL DEFAULT '',
                         Message nvarchar(1000) NOT NULL DEFAULT '',
                         AdminReply nvarchar(1000) NOT NULL DEFAULT '',
+                        CustomerReply nvarchar(1000) NOT NULL DEFAULT '',
                         IsResolved bit NOT NULL DEFAULT 0,
                         CreatedAt datetime2 NOT NULL DEFAULT GETDATE(),
-                        RepliedAt datetime2 NULL
+                        RepliedAt datetime2 NULL,
+                        CustomerRepliedAt datetime2 NULL
                     )
+                END
+                IF COL_LENGTH('SupportTickets', 'CustomerReply') IS NULL
+                BEGIN
+                    ALTER TABLE SupportTickets ADD CustomerReply nvarchar(1000) NOT NULL DEFAULT ''
+                END
+                IF COL_LENGTH('SupportTickets', 'CustomerRepliedAt') IS NULL
+                BEGIN
+                    ALTER TABLE SupportTickets ADD CustomerRepliedAt datetime2 NULL
                 END
                 IF COL_LENGTH('SupportTickets', 'ConsumerId') IS NOT NULL
                    AND NOT EXISTS

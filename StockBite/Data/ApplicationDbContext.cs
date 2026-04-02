@@ -88,6 +88,7 @@ namespace StockBite.Data
                 entity.Property(e => e.Subject).HasMaxLength(200).IsRequired();
                 entity.Property(e => e.Message).HasMaxLength(1000).IsRequired();
                 entity.Property(e => e.AdminReply).HasMaxLength(1000);
+                entity.Property(e => e.CustomerReply).HasMaxLength(1000);
 
                 entity.HasOne(e => e.Consumer)
                     .WithMany()
