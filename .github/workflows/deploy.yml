@@ -86,3 +86,19 @@ jobs:
           local-dir: ./publish/
           server-dir: /www.Stockbite.somee.com/
           state-name: .ftp-deploy-sync-state-stockbite-v2.json
+
+      - name: Remove stale app_offline file
+        shell: powershell
+        run: |
+          $request = [System.Net.FtpWebRequest]::Create("ftp://${{ secrets.FTP_SERVER }}/www.Stockbite.somee.com/app_offline.htm")
+          $request.Method = [System.Net.WebRequestMethods+Ftp]::DeleteFile
+          $request.Credentials = New-Object System.Net.NetworkCredential("${{ secrets.FTP_USERNAME }}", "${{ secrets.FTP_PASSWORD }}")
+          $request.UseBinary = $true
+          $request.KeepAlive = $false
+          try {
+            $response = $request.GetResponse()
+            $response.Close()
+          }
+          catch {
+            Write-Host "app_offline.htm was not present or could not be deleted. Continuing."
+          }
