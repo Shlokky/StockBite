@@ -13,23 +13,20 @@ namespace StockBitePrototype.Controllers
     public class ConsumerController : BaseController
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly ConsumerEmailFlowService _consumerEmailFlowService;
         private const string CartSessionKey = "ConsumerCart";
-        private static readonly List<string> Categories =
-        [
-            "All",
-            "Veggies",
-            "Dairy",
-            "Meat",
-            "Flour",
-            "Oil",
-            "Bakery",
-            "Grains"
-        ];
+        private static readonly List<string> Categories = new List<string> { "All" }
+            .Concat(ProductCatalogHelper.Categories)
+            .ToList();
 
-        public ConsumerController(ApplicationDbContext dbContext, IRoleContext roleContext)
+        public ConsumerController(
+            ApplicationDbContext dbContext,
+            IRoleContext roleContext,
+            ConsumerEmailFlowService consumerEmailFlowService)
             : base(roleContext)
         {
             _dbContext = dbContext;
+            _consumerEmailFlowService = consumerEmailFlowService;
         }
 
         public IActionResult Index(string? category)
@@ -193,7 +190,7 @@ namespace StockBitePrototype.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Checkout(string customerName, string deliveryAddress, string paymentMethod)
+        public async Task<IActionResult> Checkout(string customerName, string deliveryAddress, string paymentMethod)
         {
             if (!IsAuthorized(UserRole.Consumer))
             {
@@ -266,6 +263,18 @@ namespace StockBitePrototype.Controllers
             _dbContext.Orders.AddRange(orders);
             _dbContext.SaveChanges();
 
+            var consumer = _dbContext.Consumers.First(c => c.Id == consumerId.Value);
+            var savedOrders = _dbContext.Orders
+                .Include(o => o.Product)
+                .Include(o => o.Vendor)
+                .Where(o => orders.Select(x => x.Id).Contains(o.Id))
+                .ToList();
+
+            foreach (var order in savedOrders)
+            {
+                await _consumerEmailFlowService.SendOrderPlacedEmailAsync(consumer, order);
+            }
+
             SaveCart(new List<CartItem>());
             TempData["SuccessMessage"] = "Order submitted successfully.";
             TempData["GuestCode"] = GetConsumerCode(consumerId);
@@ -316,7 +325,7 @@ namespace StockBitePrototype.Controllers
                 return products;
             }
 
-            return products.Where(p => GetCategoryForProduct(p.Name) == selectedCategory).ToList();
+            return products.Where(p => ProductCatalogHelper.GetCategoryForProduct(p.Name, p.Category) == selectedCategory).ToList();
         }
 
         private List<Product> GetRecommendedProducts(List<Product> products, int? consumerId, string? consumerName)
@@ -501,23 +510,5 @@ namespace StockBitePrototype.Controllers
             };
         }
 
-        private static string GetCategoryForProduct(string? productName)
-        {
-            if (string.IsNullOrWhiteSpace(productName))
-            {
-                return "Veggies";
-            }
-
-            return productName.Trim().ToLowerInvariant() switch
-            {
-                "milk" or "cheese" or "butter" or "yogurt" => "Dairy",
-                "chicken" or "beef" or "mutton" => "Meat",
-                "corn flour" or "wheat flour" => "Flour",
-                "sunflower oil" or "olive oil" or "canola oil" => "Oil",
-                "bread" or "buns" => "Bakery",
-                "basmati rice" or "jasmine rice" => "Grains",
-                _ => "Veggies"
-            };
-        }
     }
 }

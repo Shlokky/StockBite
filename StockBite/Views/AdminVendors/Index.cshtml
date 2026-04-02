@@ -48,6 +48,11 @@
                         <td>@Html.DisplayFor(modelItem => item.Name)</td>
                         <td>
                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                            <form asp-action="Delete" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this vendor?');">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 }
@@ -59,4 +64,18 @@
 @if (!Model.Any())
 {
     <div class="alert alert-info mt-3">No vendors added yet. Create a vendor to continue.</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
 }

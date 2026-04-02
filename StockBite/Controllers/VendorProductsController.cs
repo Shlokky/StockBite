@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using StockBite.Controllers;
 using StockBite.Data;
 using StockBite.Models;
 using StockBite.Services;
-
 
 namespace StockBite.Controllers
 {
@@ -25,10 +23,12 @@ namespace StockBite.Controllers
             {
                 return RedirectToUnauthorized();
             }
+
             var vendorProducts = _dbContext.VendorProducts
-                                           .Include(vp => vp.Product)
-                                           .Include(vp => vp.Vendor)
-                                           .ToList();
+                .Include(vp => vp.Product)
+                .Include(vp => vp.Vendor)
+                .ToList();
+
             return View(vendorProducts);
         }
 
@@ -38,6 +38,7 @@ namespace StockBite.Controllers
             {
                 return RedirectToUnauthorized();
             }
+
             ViewData["ProductId"] = new SelectList(_dbContext.Products, "Id", "Name");
             ViewData["VendorId"] = new SelectList(_dbContext.Vendors, "Id", "Name");
             return View();
@@ -51,6 +52,7 @@ namespace StockBite.Controllers
             {
                 return RedirectToUnauthorized();
             }
+
             ModelState.Remove(nameof(VendorProduct.Vendor));
             ModelState.Remove(nameof(VendorProduct.Product));
 
@@ -66,9 +68,31 @@ namespace StockBite.Controllers
                 TempData["SuccessMessage"] = "Vendor product added successfully.";
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["ProductId"] = new SelectList(_dbContext.Products, "Id", "Name", vendorProduct.ProductId);
             ViewData["VendorId"] = new SelectList(_dbContext.Vendors, "Id", "Name", vendorProduct.VendorId);
             return View(vendorProduct);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            if (!IsAuthorized(UserRole.Admin))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var vendorProduct = _dbContext.VendorProducts.FirstOrDefault(vp => vp.Id == id);
+            if (vendorProduct == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.VendorProducts.Remove(vendorProduct);
+            _dbContext.SaveChanges();
+            TempData["SuccessMessage"] = "Vendor-product relationship deleted successfully.";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

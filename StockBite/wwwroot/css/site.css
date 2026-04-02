@@ -469,6 +469,65 @@ th {
     font-weight: 600;
 }
 
+.social-login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 48px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    font-weight: 700;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.social-login-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.social-login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.social-login-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+}
+
+.social-login-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.social-login-google {
+    background: #ffffff;
+    color: #111111;
+    border-color: #d9dce1;
+}
+
+.social-login-google:hover:not(:disabled) {
+    background: #f7f7f7;
+    color: #111111;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.social-login-apple {
+    background: #000000;
+    color: #ffffff;
+    border-color: #1f1f1f;
+}
+
+.social-login-apple:hover:not(:disabled) {
+    background: #111111;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
     .simple-link:hover {
         text-decoration: underline;
     }

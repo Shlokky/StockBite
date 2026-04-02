@@ -51,6 +51,7 @@
                         <th>Product</th>
                         <th>Price</th>
                         <th>Quantity</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,6 +70,13 @@
                                     <span class="badge text-bg-secondary">0</span>
                                 }
                             </td>
+                            <td>
+                                <form asp-action="Delete" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this relationship?');">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -80,4 +88,11 @@
 @if (!Model.Any())
 {
     <div class="alert alert-info mt-3">No vendor-product links found. Create one to start comparisons.</div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StockBite.Data;
+using StockBite.Helpers;
 using StockBite.Models;
 
 namespace StockBite.Data
@@ -22,37 +23,37 @@ namespace StockBite.Data
 
             var productSeeds = new List<Product>
             {
-                new Product { Name = "Onions", Description = "Fresh red onions", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/9/93/Onion.jpg" },
-                new Product { Name = "Potatoes", Description = "Russet potatoes", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/76/Potato.jpg" },
-                new Product { Name = "Tomatoes", Description = "Vine-ripened tomatoes", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/76/Tomato_2.jpg" },
-                new Product { Name = "Lettuce", Description = "Crisp romaine lettuce", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/6/6b/Romaine_lettuce.jpg" },
-                new Product { Name = "Carrots", Description = "Sweet orange carrots", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c8/Carrots.jpg" },
-                new Product { Name = "Cucumbers", Description = "Cool and crunchy", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c8/Cucumber_picture.jpg" },
-                new Product { Name = "Bell Peppers", Description = "Mixed colors", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Red_bell_pepper.jpg" },
-                new Product { Name = "Spinach", Description = "Fresh baby spinach", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7b/Spinach_%282009%29.jpg" },
-                new Product { Name = "Garlic", Description = "Aromatic garlic bulbs", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/22/Garlic.jpg" },
-                new Product { Name = "Ginger", Description = "Fresh ginger root", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7f/Ginger_Root_%28Zingiber_officinale%29.jpg" },
-                new Product { Name = "Broccoli", Description = "Green broccoli florets", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/41/Broccoli.jpg" },
-                new Product { Name = "Cauliflower", Description = "White cauliflower heads", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/25/Cauliflower.JPG" },
-                new Product { Name = "Mushrooms", Description = "Button mushrooms", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/03/Mushroom_%2812329086143%29.jpg" },
-                new Product { Name = "Zucchini", Description = "Tender zucchini", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Zucchini.jpg" },
-                new Product { Name = "Cabbage", Description = "Green cabbage", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/70/Cabbage.jpg" },
-                new Product { Name = "Corn Flour", Description = "Fine yellow corn flour", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5f/Cornmeal.jpg" },
-                new Product { Name = "Wheat Flour", Description = "Multi-purpose wheat flour", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/00/Flour_-_03.jpg" },
-                new Product { Name = "Basmati Rice", Description = "Long-grain aromatic rice", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/6/6f/Rice_grains.jpg" },
-                new Product { Name = "Jasmine Rice", Description = "Fragrant jasmine rice", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/0f/Jasmine_rice.jpg" },
-                new Product { Name = "Sunflower Oil", Description = "Light sunflower cooking oil", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/2f/Sunflower_oil.jpg" },
-                new Product { Name = "Olive Oil", Description = "Extra virgin olive oil", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c8/Olive_oil.jpg" },
-                new Product { Name = "Canola Oil", Description = "Refined canola oil", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/e9/Canola_Oil.jpg" },
-                new Product { Name = "Cheese", Description = "Processed cheese blocks", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/8/88/Swiss_cheese.jpg" },
-                new Product { Name = "Milk", Description = "Fresh whole milk", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/a4/Milk_glass.jpg" },
-                new Product { Name = "Butter", Description = "Salted butter packs", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/03/Butter.jpg" },
-                new Product { Name = "Yogurt", Description = "Plain dairy yogurt", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/e0/Yogurt.jpg" },
-                new Product { Name = "Bread", Description = "Fresh sandwich bread loaf", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/33/Fresh_made_bread_05.jpg" },
-                new Product { Name = "Buns", Description = "Soft burger buns", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/2b/Brioche_hamburger_buns.jpg" },
-                new Product { Name = "Chicken", Description = "Boneless chicken cuts", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/25/Raw_Chicken.jpg" },
-                new Product { Name = "Beef", Description = "Fresh beef cuts", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/34/Raw_beef_steak.jpg" },
-                new Product { Name = "Mutton", Description = "Fresh mutton pieces", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/0a/Raw_mutton.jpg" }
+                new Product { Name = "Onions", Description = "Fresh red onions", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/9/93/Onion.jpg" },
+                new Product { Name = "Potatoes", Description = "Russet potatoes", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/76/Potato.jpg" },
+                new Product { Name = "Tomatoes", Description = "Vine-ripened tomatoes", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/76/Tomato_2.jpg" },
+                new Product { Name = "Lettuce", Description = "Crisp romaine lettuce", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/6/6b/Romaine_lettuce.jpg" },
+                new Product { Name = "Carrots", Description = "Sweet orange carrots", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c8/Carrots.jpg" },
+                new Product { Name = "Cucumbers", Description = "Cool and crunchy", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c8/Cucumber_picture.jpg" },
+                new Product { Name = "Bell Peppers", Description = "Mixed colors", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5c/Red_bell_pepper.jpg" },
+                new Product { Name = "Spinach", Description = "Fresh baby spinach", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7b/Spinach_%282009%29.jpg" },
+                new Product { Name = "Garlic", Description = "Aromatic garlic bulbs", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/22/Garlic.jpg" },
+                new Product { Name = "Ginger", Description = "Fresh ginger root", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7f/Ginger_Root_%28Zingiber_officinale%29.jpg" },
+                new Product { Name = "Broccoli", Description = "Green broccoli florets", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/41/Broccoli.jpg" },
+                new Product { Name = "Cauliflower", Description = "White cauliflower heads", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/25/Cauliflower.JPG" },
+                new Product { Name = "Mushrooms", Description = "Button mushrooms", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/03/Mushroom_%2812329086143%29.jpg" },
+                new Product { Name = "Zucchini", Description = "Tender zucchini", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Zucchini.jpg" },
+                new Product { Name = "Cabbage", Description = "Green cabbage", Category = "Veggies", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/70/Cabbage.jpg" },
+                new Product { Name = "Corn Flour", Description = "Fine yellow corn flour", Category = "Flour", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/5/5f/Cornmeal.jpg" },
+                new Product { Name = "Wheat Flour", Description = "Multi-purpose wheat flour", Category = "Flour", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/00/Flour_-_03.jpg" },
+                new Product { Name = "Basmati Rice", Description = "Long-grain aromatic rice", Category = "Grains", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/6/6f/Rice_grains.jpg" },
+                new Product { Name = "Jasmine Rice", Description = "Fragrant jasmine rice", Category = "Grains", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/0f/Jasmine_rice.jpg" },
+                new Product { Name = "Sunflower Oil", Description = "Light sunflower cooking oil", Category = "Oil", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/2f/Sunflower_oil.jpg" },
+                new Product { Name = "Olive Oil", Description = "Extra virgin olive oil", Category = "Oil", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c8/Olive_oil.jpg" },
+                new Product { Name = "Canola Oil", Description = "Refined canola oil", Category = "Oil", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/e9/Canola_Oil.jpg" },
+                new Product { Name = "Cheese", Description = "Processed cheese blocks", Category = "Dairy", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/8/88/Swiss_cheese.jpg" },
+                new Product { Name = "Milk", Description = "Fresh whole milk", Category = "Dairy", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/a4/Milk_glass.jpg" },
+                new Product { Name = "Butter", Description = "Salted butter packs", Category = "Dairy", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/03/Butter.jpg" },
+                new Product { Name = "Yogurt", Description = "Plain dairy yogurt", Category = "Dairy", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/e0/Yogurt.jpg" },
+                new Product { Name = "Bread", Description = "Fresh sandwich bread loaf", Category = "Bakery", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/33/Fresh_made_bread_05.jpg" },
+                new Product { Name = "Buns", Description = "Soft burger buns", Category = "Bakery", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/2b/Brioche_hamburger_buns.jpg" },
+                new Product { Name = "Chicken", Description = "Boneless chicken cuts", Category = "Meat", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/2/25/Raw_Chicken.jpg" },
+                new Product { Name = "Beef", Description = "Fresh beef cuts", Category = "Meat", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/34/Raw_beef_steak.jpg" },
+                new Product { Name = "Mutton", Description = "Fresh mutton pieces", Category = "Meat", ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/0/0a/Raw_mutton.jpg" }
             };
 
             var vendorSeeds = new List<Vendor>
@@ -137,6 +138,30 @@ namespace StockBite.Data
                 BEGIN
                     ALTER TABLE Consumers ADD GuestCode nvarchar(50) NOT NULL DEFAULT ''
                 END
+                IF COL_LENGTH('Products', 'Category') IS NULL
+                BEGIN
+                    ALTER TABLE Products ADD Category nvarchar(50) NOT NULL DEFAULT 'Veggies'
+                END
+                IF COL_LENGTH('Consumers', 'Email') IS NULL
+                BEGIN
+                    ALTER TABLE Consumers ADD Email nvarchar(200) NULL
+                END
+                IF COL_LENGTH('Consumers', 'EmailVerified') IS NULL
+                BEGIN
+                    ALTER TABLE Consumers ADD EmailVerified bit NOT NULL DEFAULT 0
+                END
+                IF COL_LENGTH('Consumers', 'EmailAccessCode') IS NULL
+                BEGIN
+                    ALTER TABLE Consumers ADD EmailAccessCode nvarchar(20) NULL
+                END
+                IF COL_LENGTH('Consumers', 'EmailCodePurpose') IS NULL
+                BEGIN
+                    ALTER TABLE Consumers ADD EmailCodePurpose nvarchar(20) NULL
+                END
+                IF COL_LENGTH('Consumers', 'EmailCodeExpiresAt') IS NULL
+                BEGIN
+                    ALTER TABLE Consumers ADD EmailCodeExpiresAt datetime2 NULL
+                END
                 IF OBJECT_ID('SupportTickets', 'U') IS NULL
                 BEGIN
                     CREATE TABLE SupportTickets
@@ -180,13 +205,16 @@ namespace StockBite.Data
                     {
                         existing.Description = seed.Description;
                     }
+                    existing.Category = ProductCatalogHelper.GetCategoryForProduct(existing.Name, existing.Category);
                     if (string.IsNullOrWhiteSpace(existing.ImageUrl))
                     {
-                        existing.ImageUrl = seed.ImageUrl;
+                        existing.ImageUrl = ProductCatalogHelper.GetImageUrl(seed.ImageUrl, existing.Category, existing.Name);
                     }
                 }
                 else
                 {
+                    seed.Category = ProductCatalogHelper.GetCategoryForProduct(seed.Name, seed.Category);
+                    seed.ImageUrl = ProductCatalogHelper.GetImageUrl(seed.ImageUrl, seed.Category, seed.Name);
                     context.Products.Add(seed);
                 }
             }

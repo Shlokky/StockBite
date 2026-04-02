@@ -9,11 +9,16 @@ namespace StockBite.Controllers
     public class StockManagerController : BaseController
     {
         private readonly ApplicationDbContext _db;
+        private readonly ConsumerEmailFlowService _consumerEmailFlowService;
 
-        public StockManagerController(ApplicationDbContext db, IRoleContext roleContext)
+        public StockManagerController(
+            ApplicationDbContext db,
+            IRoleContext roleContext,
+            ConsumerEmailFlowService consumerEmailFlowService)
             : base(roleContext)
         {
             _db = db;
+            _consumerEmailFlowService = consumerEmailFlowService;
         }
 
         public IActionResult Index()
@@ -58,11 +63,15 @@ namespace StockBite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ApproveOrder(int orderId)
+        public async Task<IActionResult> ApproveOrder(int orderId)
         {
             if (!IsAuthorized(UserRole.StockManager)) return RedirectToUnauthorized();
 
-            var order = _db.Orders.FirstOrDefault(x => x.Id == orderId);
+            var order = _db.Orders
+                .Include(x => x.Product)
+                .Include(x => x.Vendor)
+                .Include(x => x.Consumer)
+                .FirstOrDefault(x => x.Id == orderId);
             if (order == null) return NotFound();
 
             if (order.Status != OrderStatus.Pending)
@@ -74,6 +83,7 @@ namespace StockBite.Controllers
             order.Status = OrderStatus.Approved;
             order.ApprovedAt = DateTime.Now;
             _db.SaveChanges();
+            await _consumerEmailFlowService.SendOrderApprovedEmailAsync(order.Consumer, order);
 
             TempData["SuccessMessage"] = $"Order #{order.Id} approved successfully.";
             return RedirectToAction(nameof(PendingOrders));
@@ -81,11 +91,15 @@ namespace StockBite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult MarkDelivered(int orderId)
+        public async Task<IActionResult> MarkDelivered(int orderId)
         {
             if (!IsAuthorized(UserRole.StockManager)) return RedirectToUnauthorized();
 
-            var order = _db.Orders.FirstOrDefault(x => x.Id == orderId);
+            var order = _db.Orders
+                .Include(x => x.Product)
+                .Include(x => x.Vendor)
+                .Include(x => x.Consumer)
+                .FirstOrDefault(x => x.Id == orderId);
             if (order == null) return NotFound();
 
             if (order.Status != OrderStatus.Approved)
@@ -97,6 +111,7 @@ namespace StockBite.Controllers
             order.Status = OrderStatus.Delivered;
             order.DeliveredAt = DateTime.Now;
             _db.SaveChanges();
+            await _consumerEmailFlowService.SendOrderDeliveredEmailAsync(order.Consumer, order);
 
             TempData["SuccessMessage"] = $"Order #{order.Id} marked as delivered.";
             return RedirectToAction(nameof(PendingOrders));

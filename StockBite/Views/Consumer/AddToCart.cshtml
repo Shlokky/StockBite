@@ -8,7 +8,7 @@
 
 <h1>Choose Vendor for @product.Name</h1>
 <p>Select a vendor and quantity. This will add the item to your cart.</p>
-<img src="@ProductDisplayHelper.GetImageUrl(product.Name)" alt="@product.Name" class="details-product-photo" />
+<img src="@ProductCatalogHelper.GetImageUrl(product.ImageUrl, product.Category, product.Name)" alt="@product.Name" class="details-product-photo" />
 <p class="product-unit mb-3">This product is sold in @ProductDisplayHelper.GetUnit(product.Name).</p>
 
 <table class="table">

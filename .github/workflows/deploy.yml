@@ -20,12 +20,27 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ./StockBite/StockBite.csproj
 
       - name: Publish
         run: dotnet publish ./StockBite/StockBite.csproj -c Release -o ./publish
 
-      - name: Deploy via FTP
+      - name: Create app_offline file
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path .\deploy-offline | Out-Null
+          Set-Content -Path .\deploy-offline\app_offline.htm -Value "StockBite is updating. Please refresh in a minute."
+
+      - name: Put Somee site offline
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy-offline/
+          server-dir: /www.Stockbite.somee.com/
+
+      - name: Deploy published files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -33,3 +48,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/
           server-dir: /www.Stockbite.somee.com/
+          dangerous-clean-slate: true

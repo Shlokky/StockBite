@@ -1,5 +1,7 @@
-
 using System.Diagnostics;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using StockBite.Data;
 using StockBite.Models;
@@ -12,6 +14,7 @@ namespace StockBite.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _dbContext;
         private readonly IRoleContext _roleContext;
+        private readonly IConfiguration _configuration;
         private readonly string _demoPassword;
 
         public HomeController(
@@ -23,6 +26,7 @@ namespace StockBite.Controllers
             _logger = logger;
             _dbContext = dbContext;
             _roleContext = roleContext;
+            _configuration = configuration;
             _demoPassword = configuration["DemoAuth:Password"] ?? "xyzpass";
         }
 
@@ -90,6 +94,7 @@ namespace StockBite.Controllers
 
         public IActionResult ConsumerAccess()
         {
+            ViewBag.GoogleEnabled = IsGoogleConfigured();
             return View();
         }
 
@@ -105,12 +110,7 @@ namespace StockBite.Controllers
             _dbContext.Consumers.Add(guestConsumer);
             _dbContext.SaveChanges();
 
-            ResetUserContext();
-            HttpContext.Session.Remove("ConsumerCart");
-            _roleContext.SetRole(UserRole.Consumer);
-            _roleContext.SetAuthenticated(true);
-            _roleContext.SetConsumerId(guestConsumer.Id);
-
+            SignInConsumer(guestConsumer.Id);
             return RedirectToAction("Index", "Consumer");
         }
 
@@ -118,7 +118,7 @@ namespace StockBite.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ContinueGuest(string guestCode)
         {
-            guestCode = (guestCode ?? "").Trim().ToUpper();
+            guestCode = (guestCode ?? string.Empty).Trim().ToUpper();
 
             if (string.IsNullOrWhiteSpace(guestCode))
             {
@@ -133,19 +133,87 @@ namespace StockBite.Controllers
                 return RedirectToAction(nameof(ConsumerAccess));
             }
 
-            ResetUserContext();
-            HttpContext.Session.Remove("ConsumerCart");
-            _roleContext.SetRole(UserRole.Consumer);
-            _roleContext.SetAuthenticated(true);
-            _roleContext.SetConsumerId(guestConsumer.Id);
-
+            SignInConsumer(guestConsumer.Id);
             return RedirectToAction("Orders", "Consumer");
         }
 
-        public IActionResult Logout()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult StartExternalLogin()
+        {
+            if (!IsGoogleConfigured())
+            {
+                TempData["ErrorMessage"] = "Google sign-in is not configured yet on this server.";
+                return RedirectToAction(nameof(ConsumerAccess));
+            }
+
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action(nameof(ExternalLoginCallback))
+            };
+
+            return Challenge(properties, "Google");
+        }
+
+        public async Task<IActionResult> ExternalLoginCallback()
+        {
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                TempData["ErrorMessage"] = "Google sign-in was not completed.";
+                return RedirectToAction(nameof(ConsumerAccess));
+            }
+
+            var externalResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = externalResult.Principal ?? User;
+
+            var email = principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue("email");
+            var name = principal.FindFirstValue(ClaimTypes.Name) ?? principal.FindFirstValue("name");
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                TempData["ErrorMessage"] = "Google did not return an email address. Please try again.";
+                return RedirectToAction(nameof(ConsumerAccess));
+            }
+
+            var consumer = _dbContext.Consumers.FirstOrDefault(c => c.Email != null && c.Email.ToLower() == email.ToLower());
+            if (consumer == null)
+            {
+                consumer = new Consumer
+                {
+                    Name = string.IsNullOrWhiteSpace(name) ? "Google User" : name,
+                    Email = email,
+                    EmailVerified = true,
+                    GuestCode = Guid.NewGuid().ToString("N")[..6].ToUpper()
+                };
+
+                _dbContext.Consumers.Add(consumer);
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(consumer.Name) && !string.IsNullOrWhiteSpace(name))
+                {
+                    consumer.Name = name;
+                }
+
+                consumer.Email = email;
+                consumer.EmailVerified = true;
+            }
+
+            _dbContext.SaveChanges();
+
+            SignInConsumer(consumer.Id);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            TempData["SuccessMessage"] = "Google sign-in completed successfully.";
+            return RedirectToAction("Index", "Consumer");
+        }
+
+        public async Task<IActionResult> Logout()
         {
             ResetUserContext();
             HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction(nameof(Index));
         }
 
@@ -179,12 +247,29 @@ namespace StockBite.Controllers
             return false;
         }
 
+        private bool IsGoogleConfigured()
+        {
+            var clientId = _configuration["Authentication:Google:ClientId"];
+            var clientSecret = _configuration["Authentication:Google:ClientSecret"];
+
+            return !string.IsNullOrWhiteSpace(clientId) && !string.IsNullOrWhiteSpace(clientSecret);
+        }
+
         private void ResetUserContext()
         {
             _roleContext.SetAuthenticated(false);
             _roleContext.SetRole(UserRole.Public);
             _roleContext.SetVendorId(null);
             _roleContext.SetConsumerId(null);
+        }
+
+        private void SignInConsumer(int consumerId)
+        {
+            ResetUserContext();
+            HttpContext.Session.Remove("ConsumerCart");
+            _roleContext.SetRole(UserRole.Consumer);
+            _roleContext.SetAuthenticated(true);
+            _roleContext.SetConsumerId(consumerId);
         }
     }
 }

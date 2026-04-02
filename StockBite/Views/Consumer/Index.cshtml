@@ -54,7 +54,7 @@
                         @foreach (var item in Model.RecommendedProducts)
                         {
                             <a asp-action="AddToCart" asp-route-id="@item.Id" class="recommend-item">
-                                <img src="@ProductDisplayHelper.GetImageUrl(item.Name)" alt="@item.Name" class="recommend-photo" />
+                                <img src="@ProductCatalogHelper.GetImageUrl(item.ImageUrl, item.Category, item.Name)" alt="@item.Name" class="recommend-photo" />
                                 <div>
                                     <strong>@item.Name</strong>
                                     <div class="small">Buy by @ProductDisplayHelper.GetUnit(item.Name)</div>
@@ -127,7 +127,7 @@
             {
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="@ProductDisplayHelper.GetImageUrl(item.Name)" alt="@item.Name" class="product-photo" />
+                        <img src="@ProductCatalogHelper.GetImageUrl(item.ImageUrl, item.Category, item.Name)" alt="@item.Name" class="product-photo" />
                     </div>
                     <div class="product-body">
                         <h5>@item.Name</h5>
