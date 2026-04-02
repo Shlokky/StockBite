@@ -85,3 +85,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/
           server-dir: /www.Stockbite.somee.com/
+          state-name: .ftp-deploy-sync-state-stockbite-v2.json
