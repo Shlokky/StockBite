@@ -77,21 +77,6 @@ jobs:
           }
           $json | ConvertTo-Json -Depth 10 | Set-Content $path
 
-      - name: Create app_offline file
-        shell: powershell
-        run: |
-          New-Item -ItemType Directory -Force -Path .\deploy-offline | Out-Null
-          Set-Content -Path .\deploy-offline\app_offline.htm -Value "StockBite is updating. Please refresh in a minute."
-
-      - name: Put Somee site offline
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./deploy-offline/
-          server-dir: /www.Stockbite.somee.com/
-
       - name: Deploy published files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
