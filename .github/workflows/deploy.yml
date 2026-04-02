@@ -36,8 +36,14 @@ jobs:
           if (-not $json.Authentication.Google) {
             $json.Authentication | Add-Member -MemberType NoteProperty -Name Google -Value (@{})
           }
-          $json.Authentication.Google.ClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
-          $json.Authentication.Google.ClientSecret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          $googleClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
+          $googleClientSecret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          if (-not [string]::IsNullOrWhiteSpace($googleClientId)) {
+            $json.Authentication.Google.ClientId = $googleClientId
+          }
+          if (-not [string]::IsNullOrWhiteSpace($googleClientSecret)) {
+            $json.Authentication.Google.ClientSecret = $googleClientSecret
+          }
           $json | ConvertTo-Json -Depth 10 | Set-Content $path
 
       - name: Create app_offline file
