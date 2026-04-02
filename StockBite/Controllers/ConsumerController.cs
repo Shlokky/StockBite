@@ -13,7 +13,7 @@ namespace StockBitePrototype.Controllers
     public class ConsumerController : BaseController
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly ConsumerEmailFlowService _consumerEmailFlowService;
+        private readonly OrderStatusEmailService _orderStatusEmailService;
         private const string CartSessionKey = "ConsumerCart";
         private static readonly List<string> Categories = new List<string> { "All" }
             .Concat(ProductCatalogHelper.Categories)
@@ -22,11 +22,11 @@ namespace StockBitePrototype.Controllers
         public ConsumerController(
             ApplicationDbContext dbContext,
             IRoleContext roleContext,
-            ConsumerEmailFlowService consumerEmailFlowService)
+            OrderStatusEmailService orderStatusEmailService)
             : base(roleContext)
         {
             _dbContext = dbContext;
-            _consumerEmailFlowService = consumerEmailFlowService;
+            _orderStatusEmailService = orderStatusEmailService;
         }
 
         public IActionResult Index(string? category)
@@ -272,7 +272,7 @@ namespace StockBitePrototype.Controllers
 
             foreach (var order in savedOrders)
             {
-                await _consumerEmailFlowService.SendOrderPlacedEmailAsync(consumer, order);
+                await _orderStatusEmailService.SendPlacedEmailAsync(consumer, order);
             }
 
             SaveCart(new List<CartItem>());

@@ -20,6 +20,8 @@ builder.Services.AddScoped<IRoleContext, RoleContext>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ConsumerEmailFlowService>();
+builder.Services.AddScoped<OrderStatusEmailTextBuilder>();
+builder.Services.AddScoped<OrderStatusEmailService>();
 builder.Services.AddSignalR();
 
 var authenticationBuilder = builder.Services

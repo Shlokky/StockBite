@@ -9,16 +9,16 @@ namespace StockBite.Controllers
     public class StockManagerController : BaseController
     {
         private readonly ApplicationDbContext _db;
-        private readonly ConsumerEmailFlowService _consumerEmailFlowService;
+        private readonly OrderStatusEmailService _orderStatusEmailService;
 
         public StockManagerController(
             ApplicationDbContext db,
             IRoleContext roleContext,
-            ConsumerEmailFlowService consumerEmailFlowService)
+            OrderStatusEmailService orderStatusEmailService)
             : base(roleContext)
         {
             _db = db;
-            _consumerEmailFlowService = consumerEmailFlowService;
+            _orderStatusEmailService = orderStatusEmailService;
         }
 
         public IActionResult Index()
@@ -83,7 +83,7 @@ namespace StockBite.Controllers
             order.Status = OrderStatus.Approved;
             order.ApprovedAt = DateTime.Now;
             _db.SaveChanges();
-            await _consumerEmailFlowService.SendOrderApprovedEmailAsync(order.Consumer, order);
+            await _orderStatusEmailService.SendApprovedEmailAsync(order.Consumer, order);
 
             TempData["SuccessMessage"] = $"Order #{order.Id} approved successfully.";
             return RedirectToAction(nameof(PendingOrders));
@@ -111,7 +111,7 @@ namespace StockBite.Controllers
             order.Status = OrderStatus.Delivered;
             order.DeliveredAt = DateTime.Now;
             _db.SaveChanges();
-            await _consumerEmailFlowService.SendOrderDeliveredEmailAsync(order.Consumer, order);
+            await _orderStatusEmailService.SendDeliveredEmailAsync(order.Consumer, order);
 
             TempData["SuccessMessage"] = $"Order #{order.Id} marked as delivered.";
             return RedirectToAction(nameof(PendingOrders));
