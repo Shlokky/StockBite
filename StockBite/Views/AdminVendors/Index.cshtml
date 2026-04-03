@@ -2,7 +2,8 @@
 
 @{
     ViewData["Title"] = "Vendors";
-    var totalVendors = Model?.Count() ?? 0;
+    var vendors = Model ?? Enumerable.Empty<StockBite.Models.Vendor>();
+    var totalVendors = vendors.Count();
 }
 
 <div class="page-header">
@@ -42,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in vendors)
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => item.Name)</td>
@@ -61,7 +62,7 @@
     </div>
 </div>
 
-@if (!Model.Any())
+@if (!vendors.Any())
 {
     <div class="alert alert-info mt-3">No vendors added yet. Create a vendor to continue.</div>
 }

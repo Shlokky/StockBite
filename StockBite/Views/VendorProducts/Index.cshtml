@@ -2,8 +2,9 @@
 
 @{
     ViewData["Title"] = "Vendor Products";
-    var relationCount = Model?.Count() ?? 0;
-    var grouped = Model
+    var relationships = Model ?? Enumerable.Empty<StockBite.Models.VendorProduct>();
+    var relationCount = relationships.Count();
+    var grouped = relationships
         .OrderBy(vp => vp.Vendor.Name)
         .ThenBy(vp => vp.Product.Name)
         .GroupBy(vp => vp.Vendor.Name)
@@ -85,7 +86,7 @@
     </div>
 }
 
-@if (!Model.Any())
+@if (!relationships.Any())
 {
     <div class="alert alert-info mt-3">No vendor-product links found. Create one to start comparisons.</div>
 }

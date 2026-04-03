@@ -3,7 +3,8 @@
 
 @{
     ViewData["Title"] = "My Orders";
-    var orderCount = Model?.Count() ?? 0;
+    var orders = Model ?? Enumerable.Empty<StockBite.Models.Order>();
+    var orderCount = orders.Count();
     var consumerCode = ViewBag.ConsumerCode as string ?? "";
 }
 
@@ -53,7 +54,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in orders)
                 {
                     <tr>
                         <td>@item.Product.Name</td>

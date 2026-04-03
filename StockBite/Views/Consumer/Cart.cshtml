@@ -4,6 +4,11 @@
 @{
     ViewData["Title"] = "Cart";
     var lineCount = Model?.Lines?.Count ?? 0;
+    var lines = Model?.Lines ?? new List<StockBite.ViewModels.CartLineViewModel>();
+    var total = Model?.Total ?? 0;
+    var customerName = Model?.CustomerName ?? "";
+    var deliveryAddress = Model?.DeliveryAddress ?? "";
+    var paymentMethod = Model?.PaymentMethod ?? "";
 }
 
 <div class="page-header">
@@ -14,7 +19,7 @@
     <span class="badge text-bg-warning px-3 py-2">Items: @lineCount</span>
 </div>
 
-@if (Model.Lines.Count == 0)
+@if (lines.Count == 0)
 {
     <div class="card app-card">
         <div class="card-body">
@@ -39,7 +44,7 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var line in Model.Lines)
+                    @foreach (var line in lines)
                     {
                         <tr>
                             <td>@line.ProductName</td>
@@ -64,7 +69,7 @@ else
     </div>
 
     <div class="d-flex justify-content-between align-items-center">
-        <strong>Total: @Model.Total.ToString("C")</strong>
+        <strong>Total: @total.ToString("C")</strong>
     </div>
     <div class="card app-card mt-3">
         <div class="card-body">
@@ -73,19 +78,19 @@ else
                 @Html.AntiForgeryToken()
                 <div class="mb-3">
                     <label class="form-label" for="customerName">Who is placing the order?</label>
-                    <input type="text" class="form-control" id="customerName" name="customerName" value="@Model.CustomerName" placeholder="Enter your name" />
+                    <input type="text" class="form-control" id="customerName" name="customerName" value="@customerName" placeholder="Enter your name" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="deliveryAddress">Where to deliver?</label>
-                    <textarea class="form-control" id="deliveryAddress" name="deliveryAddress" rows="3" placeholder="Enter delivery address">@Model.DeliveryAddress</textarea>
+                    <textarea class="form-control" id="deliveryAddress" name="deliveryAddress" rows="3" placeholder="Enter delivery address">@deliveryAddress</textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="paymentMethod">How will you pay?</label>
                     <select class="form-select" id="paymentMethod" name="paymentMethod">
                         <option value="">Select payment method</option>
-                        <option value="Cash on Delivery" selected="@(Model.PaymentMethod == "Cash on Delivery")">Cash on Delivery</option>
-                        <option value="Card" selected="@(Model.PaymentMethod == "Card")">Card</option>
-                        <option value="Online Transfer" selected="@(Model.PaymentMethod == "Online Transfer")">Online Transfer</option>
+                        <option value="Cash on Delivery" selected="@(paymentMethod == "Cash on Delivery")">Cash on Delivery</option>
+                        <option value="Card" selected="@(paymentMethod == "Card")">Card</option>
+                        <option value="Online Transfer" selected="@(paymentMethod == "Online Transfer")">Online Transfer</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-success">Place Order</button>

@@ -2,7 +2,8 @@
 
 @{
     ViewData["Title"] = "Customer Tickets";
-    var ticketCount = Model?.Count() ?? 0;
+    var tickets = Model ?? Enumerable.Empty<StockBite.Models.SupportTicket>();
+    var ticketCount = tickets.Count();
 }
 
 <div class="page-header">
@@ -15,10 +16,10 @@
 
 <div class="card app-card">
     <div class="card-body">
-        @if (Model.Any())
+        @if (tickets.Any())
         {
             <div class="ticket-list">
-                @foreach (var item in Model)
+                @foreach (var item in tickets)
                 {
                     <div class="ticket-item">
                         <div class="d-flex justify-content-between gap-3 mb-2">

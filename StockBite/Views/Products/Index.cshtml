@@ -2,7 +2,8 @@
 
 @{
     ViewData["Title"] = "Products";
-    var totalProducts = Model?.Count() ?? 0;
+    var products = Model ?? Enumerable.Empty<StockBite.Models.Product>();
+    var totalProducts = products.Count();
 }
 
 <div class="page-header">
@@ -37,14 +38,14 @@
         <table class="table table-hover mb-0">
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.Name)</th>
-                    <th>@Html.DisplayNameFor(model => model.Description)</th>
-                    <th>@Html.DisplayNameFor(model => model.Category)</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in products)
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => item.Name)</td>
@@ -65,7 +66,7 @@
     </div>
 </div>
 
-@if (!Model.Any())
+@if (!products.Any())
 {
     <div class="alert alert-info mt-3">No products available. Add a product to get started.</div>
 }

@@ -6,18 +6,24 @@
     var productCount = Model?.Products?.Count ?? 0;
     var categories = ViewBag.Categories as List<string> ?? new List<string> { "All" };
     var selectedCategory = (ViewBag.SelectedCategory as string) ?? "All";
+    var consumerName = Model?.ConsumerName ?? "";
+    var consumerCode = Model?.ConsumerCode ?? "";
+    var recommendedProducts = Model?.RecommendedProducts ?? new List<StockBite.Models.Product>();
+    var priorityProducts = Model?.PriorityProducts ?? new List<StockBite.ViewModels.ConsumerStockItemViewModel>();
+    var currentStock = Model?.CurrentStock ?? new List<StockBite.ViewModels.ConsumerStockItemViewModel>();
+    var products = Model?.Products ?? new List<StockBite.Models.Product>();
 }
 
 <div class="page-header">
     <div>
         <h1 class="page-title">Consumer Dashboard</h1>
         <p class="page-subtitle">Browse items, compare offers, and manage your cart.</p>
-        @if (!string.IsNullOrWhiteSpace(Model.ConsumerName))
+        @if (!string.IsNullOrWhiteSpace(consumerName))
         {
-            <div class="small mt-1">User: @Model.ConsumerName</div>
-            @if (!string.IsNullOrWhiteSpace(Model.ConsumerCode))
+            <div class="small mt-1">User: @consumerName</div>
+            @if (!string.IsNullOrWhiteSpace(consumerCode))
             {
-                <div class="small tracking-code-text">Tracking Code: <strong>@Model.ConsumerCode</strong></div>
+                <div class="small tracking-code-text">Tracking Code: <strong>@consumerCode</strong></div>
             }
         }
     </div>
@@ -45,13 +51,13 @@
 
 <div class="row g-3">
     <div class="col-lg-4">
-        @if (Model.RecommendedProducts.Any())
+        @if (recommendedProducts.Any())
         {
             <div class="card app-card mb-3">
                 <div class="card-body">
                     <h5 class="mb-3">Recommended For You</h5>
                     <div class="recommend-list">
-                        @foreach (var item in Model.RecommendedProducts)
+                        @foreach (var item in recommendedProducts)
                         {
                             <a asp-action="AddToCart" asp-route-id="@item.Id" class="recommend-item">
                                 <img src="@ProductCatalogHelper.GetImageUrl(item.ImageUrl, item.Category, item.Name)" alt="@item.Name" class="recommend-photo" />
@@ -66,13 +72,13 @@
             </div>
         }
 
-        @if (Model.PriorityProducts.Any())
+        @if (priorityProducts.Any())
         {
             <div class="card app-card mb-3">
                 <div class="card-body">
                     <h5 class="mb-3">Order These As Priority</h5>
                     <div class="stock-list">
-                        @foreach (var item in Model.PriorityProducts)
+                        @foreach (var item in priorityProducts)
                         {
                             <div class="stock-item">
                                 <strong>@item.ProductName</strong>
@@ -85,13 +91,13 @@
             </div>
         }
 
-        @if (Model.CurrentStock.Any())
+        @if (currentStock.Any())
         {
             <div class="card app-card mb-3">
                 <div class="card-body">
                     <h5 class="mb-3">Items In Your Inventory</h5>
                     <div class="stock-list">
-                        @foreach (var item in Model.CurrentStock)
+                        @foreach (var item in currentStock)
                         {
                             <div class="stock-item">
                                 <strong>@item.ProductName</strong>
@@ -123,7 +129,7 @@
         </div>
 
         <div class="product-grid">
-            @foreach (var item in Model.Products)
+            @foreach (var item in products)
             {
                 <div class="product-card">
                     <div class="product-image">
@@ -139,7 +145,7 @@
             }
         </div>
 
-        @if (!Model.Products.Any())
+        @if (!products.Any())
         {
             <div class="alert alert-info mt-3">No products found for this category.</div>
         }

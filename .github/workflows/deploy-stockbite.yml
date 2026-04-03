@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-and-deploy:
     runs-on: windows-latest
@@ -25,7 +28,7 @@ jobs:
       - name: Publish
         run: dotnet publish ./StockBite/StockBite.csproj -c Release -o ./publish
 
-      - name: Inject Google OAuth settings into published appsettings
+      - name: Inject settings into published appsettings
         shell: powershell
         run: |
           $path = ".\publish\appsettings.json"
@@ -77,34 +80,75 @@ jobs:
           }
           $json | ConvertTo-Json -Depth 10 | Set-Content $path
 
-      - name: Put app offline with direct FTP upload
+      - name: Upload app_offline.htm
         shell: powershell
         run: |
-          $content = "StockBite is updating. Please refresh in a minute."
-          $bytes = [System.Text.Encoding]::UTF8.GetBytes($content)
-          $request = [System.Net.FtpWebRequest]::Create("ftp://${{ secrets.FTP_SERVER }}/www.Stockbite.somee.com/app_offline.htm")
+          $root = "ftp://${{ secrets.FTP_SERVER }}/www.Stockbite.somee.com"
+          $credentials = New-Object System.Net.NetworkCredential("${{ secrets.FTP_USERNAME }}", "${{ secrets.FTP_PASSWORD }}")
+          $content = [System.Text.Encoding]::UTF8.GetBytes("StockBite is updating. Please refresh in a minute.")
+          $request = [System.Net.FtpWebRequest]::Create("$root/app_offline.htm")
           $request.Method = [System.Net.WebRequestMethods+Ftp]::UploadFile
-          $request.Credentials = New-Object System.Net.NetworkCredential("${{ secrets.FTP_USERNAME }}", "${{ secrets.FTP_PASSWORD }}")
+          $request.Credentials = $credentials
           $request.UseBinary = $true
           $request.KeepAlive = $false
-          $request.ContentLength = $bytes.Length
+          $request.ContentLength = $content.Length
           $stream = $request.GetRequestStream()
-          $stream.Write($bytes, 0, $bytes.Length)
+          $stream.Write($content, 0, $content.Length)
           $stream.Close()
           $response = $request.GetResponse()
           $response.Close()
+          Start-Sleep -Seconds 5
 
-      - name: Deploy published files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/
-          server-dir: /www.Stockbite.somee.com/
-          state-name: .ftp-deploy-sync-state-stockbite-v2.json
+      - name: Upload published files with PowerShell FTP
+        shell: powershell
+        run: |
+          $publishPath = Resolve-Path ".\publish"
+          $root = "ftp://${{ secrets.FTP_SERVER }}/www.Stockbite.somee.com"
+          $credentials = New-Object System.Net.NetworkCredential("${{ secrets.FTP_USERNAME }}", "${{ secrets.FTP_PASSWORD }}")
 
-      - name: Remove stale app_offline file
+          function New-FtpDirectoryIfMissing {
+            param([string]$DirectoryUrl)
+
+            try {
+              $request = [System.Net.FtpWebRequest]::Create($DirectoryUrl)
+              $request.Method = [System.Net.WebRequestMethods+Ftp]::MakeDirectory
+              $request.Credentials = $credentials
+              $request.UseBinary = $true
+              $request.KeepAlive = $false
+              $response = $request.GetResponse()
+              $response.Close()
+            }
+            catch {
+            }
+          }
+
+          $directories = Get-ChildItem -Path $publishPath -Directory -Recurse | Sort-Object FullName
+          foreach ($directory in $directories) {
+            $relative = $directory.FullName.Substring($publishPath.Path.Length).TrimStart('\').Replace('\', '/')
+            if (-not [string]::IsNullOrWhiteSpace($relative)) {
+              New-FtpDirectoryIfMissing -DirectoryUrl "$root/$relative"
+            }
+          }
+
+          $files = Get-ChildItem -Path $publishPath -File -Recurse
+          foreach ($file in $files) {
+            $relative = $file.FullName.Substring($publishPath.Path.Length).TrimStart('\').Replace('\', '/')
+            $targetUrl = "$root/$relative"
+            $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+            $request = [System.Net.FtpWebRequest]::Create($targetUrl)
+            $request.Method = [System.Net.WebRequestMethods+Ftp]::UploadFile
+            $request.Credentials = $credentials
+            $request.UseBinary = $true
+            $request.KeepAlive = $false
+            $request.ContentLength = $bytes.Length
+            $stream = $request.GetRequestStream()
+            $stream.Write($bytes, 0, $bytes.Length)
+            $stream.Close()
+            $response = $request.GetResponse()
+            $response.Close()
+          }
+
+      - name: Remove app_offline.htm
         shell: powershell
         run: |
           $request = [System.Net.FtpWebRequest]::Create("ftp://${{ secrets.FTP_SERVER }}/www.Stockbite.somee.com/app_offline.htm")
