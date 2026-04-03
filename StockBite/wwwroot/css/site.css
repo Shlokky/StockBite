@@ -555,6 +555,20 @@ th {
     background: rgba(255, 214, 107, 0.08);
 }
 
+.consumer-access-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 1rem;
+}
+
+.consumer-access-panel {
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+}
+
 .app-nav .navbar-collapse {
     row-gap: 0.75rem;
 }
@@ -588,6 +602,10 @@ th {
 @media (max-width: 991px) {
     .metrics-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .consumer-access-grid {
+        grid-template-columns: 1fr;
     }
 
     .landing-hero {

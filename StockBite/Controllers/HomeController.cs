@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using StockBite.Data;
 using StockBite.Models;
 using StockBite.Services;
+using StockBite.ViewModels;
 
 namespace StockBite.Controllers
 {
@@ -15,18 +16,24 @@ namespace StockBite.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IRoleContext _roleContext;
         private readonly IConfiguration _configuration;
+        private readonly ConsumerEmailFlowService _consumerEmailFlowService;
+        private readonly ConsumerAuthCodeService _consumerAuthCodeService;
         private readonly string _demoPassword;
 
         public HomeController(
             ILogger<HomeController> logger,
             ApplicationDbContext dbContext,
             IRoleContext roleContext,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ConsumerEmailFlowService consumerEmailFlowService,
+            ConsumerAuthCodeService consumerAuthCodeService)
         {
             _logger = logger;
             _dbContext = dbContext;
             _roleContext = roleContext;
             _configuration = configuration;
+            _consumerEmailFlowService = consumerEmailFlowService;
+            _consumerAuthCodeService = consumerAuthCodeService;
             _demoPassword = configuration["DemoAuth:Password"] ?? "xyzpass";
         }
 
@@ -92,11 +99,16 @@ namespace StockBite.Controllers
             return View();
         }
 
-        public IActionResult ConsumerAccess(string? externalError = null)
+        public IActionResult ConsumerAccess(string? externalError = null, string? email = null)
         {
             ViewBag.GoogleEnabled = IsGoogleConfigured();
             ViewBag.ExternalError = externalError;
-            return View();
+            var model = new ConsumerAccessViewModel();
+            var cleanedEmail = CleanEmail(email);
+            model.SignUpEmail = cleanedEmail;
+            model.VerificationEmail = cleanedEmail;
+            model.LoginEmail = cleanedEmail;
+            return View(model);
         }
 
         public IActionResult StartGuestCheckout()
@@ -136,6 +148,135 @@ namespace StockBite.Controllers
 
             SignInConsumer(guestConsumer.Id);
             return RedirectToAction("Orders", "Consumer");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SignUpWithEmail(ConsumerAccessViewModel model)
+        {
+            model.SignUpName = CleanText(model.SignUpName);
+            model.SignUpEmail = CleanEmail(model.SignUpEmail);
+
+            if (string.IsNullOrWhiteSpace(model.SignUpName) || string.IsNullOrWhiteSpace(model.SignUpEmail))
+            {
+                TempData["ErrorMessage"] = "Enter your name and email.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.SignUpEmail });
+            }
+
+            var consumer = _dbContext.Consumers.FirstOrDefault(c => c.Email != null && c.Email.ToLower() == model.SignUpEmail.ToLower());
+            if (consumer == null)
+            {
+                consumer = new Consumer
+                {
+                    Name = model.SignUpName,
+                    Email = model.SignUpEmail,
+                    GuestCode = Guid.NewGuid().ToString("N")[..6].ToUpper()
+                };
+
+                _dbContext.Consumers.Add(consumer);
+            }
+            else
+            {
+                consumer.Name = model.SignUpName;
+                consumer.Email = model.SignUpEmail;
+            }
+
+            if (consumer.EmailVerified)
+            {
+                TempData["SuccessMessage"] = "Email already verified. Use email sign in below.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.SignUpEmail });
+            }
+
+            var code = _consumerEmailFlowService.GenerateAccessCode();
+            _consumerAuthCodeService.SetVerificationCode(consumer, code);
+            _dbContext.SaveChanges();
+            await _consumerEmailFlowService.SendVerificationCodeAsync(consumer, code);
+
+            TempData["SuccessMessage"] = "Verification code sent to your email.";
+            return RedirectToAction(nameof(ConsumerAccess), new { email = model.SignUpEmail });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyEmailSignUp(ConsumerAccessViewModel model)
+        {
+            model.VerificationEmail = CleanEmail(model.VerificationEmail);
+            model.VerificationCode = CleanText(model.VerificationCode);
+
+            var consumer = _dbContext.Consumers.FirstOrDefault(c => c.Email != null && c.Email.ToLower() == model.VerificationEmail.ToLower());
+            if (consumer == null)
+            {
+                TempData["ErrorMessage"] = "Email account not found.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.VerificationEmail });
+            }
+
+            if (!_consumerAuthCodeService.IsVerificationCodeValid(consumer, model.VerificationCode))
+            {
+                TempData["ErrorMessage"] = "Verification code is invalid or expired.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.VerificationEmail });
+            }
+
+            consumer.EmailVerified = true;
+            _consumerAuthCodeService.ClearCode(consumer);
+            _dbContext.SaveChanges();
+            SignInConsumer(consumer.Id);
+            TempData["SuccessMessage"] = "Email verified successfully.";
+            return RedirectToAction("Index", "Consumer");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> StartEmailLogin(ConsumerAccessViewModel model)
+        {
+            model.LoginEmail = CleanEmail(model.LoginEmail);
+
+            var consumer = _dbContext.Consumers.FirstOrDefault(c => c.Email != null && c.Email.ToLower() == model.LoginEmail.ToLower());
+            if (consumer == null)
+            {
+                TempData["ErrorMessage"] = "Email account not found.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.LoginEmail });
+            }
+
+            if (!consumer.EmailVerified)
+            {
+                TempData["ErrorMessage"] = "Verify your email first, then sign in.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.LoginEmail });
+            }
+
+            var code = _consumerEmailFlowService.GenerateAccessCode();
+            _consumerAuthCodeService.SetLoginCode(consumer, code);
+            _dbContext.SaveChanges();
+            await _consumerEmailFlowService.SendLoginCodeAsync(consumer, code);
+
+            TempData["SuccessMessage"] = "Login code sent to your email.";
+            return RedirectToAction(nameof(ConsumerAccess), new { email = model.LoginEmail });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyEmailLogin(ConsumerAccessViewModel model)
+        {
+            model.LoginEmail = CleanEmail(model.LoginEmail);
+            model.LoginCode = CleanText(model.LoginCode);
+
+            var consumer = _dbContext.Consumers.FirstOrDefault(c => c.Email != null && c.Email.ToLower() == model.LoginEmail.ToLower());
+            if (consumer == null)
+            {
+                TempData["ErrorMessage"] = "Email account not found.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.LoginEmail });
+            }
+
+            if (!_consumerAuthCodeService.IsLoginCodeValid(consumer, model.LoginCode))
+            {
+                TempData["ErrorMessage"] = "Login code is invalid or expired.";
+                return RedirectToAction(nameof(ConsumerAccess), new { email = model.LoginEmail });
+            }
+
+            _consumerAuthCodeService.ClearCode(consumer);
+            _dbContext.SaveChanges();
+            SignInConsumer(consumer.Id);
+            TempData["SuccessMessage"] = "Signed in successfully.";
+            return RedirectToAction("Index", "Consumer");
         }
 
         [HttpPost]
@@ -271,6 +412,16 @@ namespace StockBite.Controllers
             _roleContext.SetRole(UserRole.Consumer);
             _roleContext.SetAuthenticated(true);
             _roleContext.SetConsumerId(consumerId);
+        }
+
+        private static string CleanEmail(string? email)
+        {
+            return (email ?? string.Empty).Trim().ToLowerInvariant();
+        }
+
+        private static string CleanText(string? value)
+        {
+            return (value ?? string.Empty).Trim();
         }
     }
 }

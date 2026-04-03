@@ -9,25 +9,31 @@ namespace StockBite.Controllers
 {
     public class SupportController : BaseController
     {
+        private const string SupportEmailSessionKey = "SupportTicketEmail";
         private readonly ApplicationDbContext _db;
         private readonly SupportTicketReplyService _supportTicketReplyService;
+        private readonly SupportTicketLookupService _supportTicketLookupService;
 
         public SupportController(
             ApplicationDbContext db,
             IRoleContext roleContext,
-            SupportTicketReplyService supportTicketReplyService)
+            SupportTicketReplyService supportTicketReplyService,
+            SupportTicketLookupService supportTicketLookupService)
             : base(roleContext)
         {
             _db = db;
             _supportTicketReplyService = supportTicketReplyService;
+            _supportTicketLookupService = supportTicketLookupService;
         }
 
-        public IActionResult ContactUs()
+        public IActionResult ContactUs(string? customerEmail = null)
         {
+            var emailToUse = GetCurrentSupportEmail(customerEmail);
             return View(new SupportPageViewModel
             {
                 CustomerName = GetCustomerName(),
-                Tickets = GetMyTickets()
+                CustomerEmail = emailToUse,
+                Tickets = GetMyTickets(emailToUse)
             });
         }
 
@@ -44,9 +50,11 @@ namespace StockBite.Controllers
 model.Message == "")
             {
                 TempData["ErrorMessage"] = "Fill in all ticket details.";
-                model.Tickets = GetMyTickets();
+                model.Tickets = GetMyTickets(model.CustomerEmail);
                 return View(model);
             }
+
+            RememberSupportEmail(model.CustomerEmail);
 
             _db.SupportTickets.Add(new SupportTicket
             {
@@ -59,7 +67,16 @@ model.Message == "")
 
             _db.SaveChanges();
             TempData["SuccessMessage"] = "Your ticket has been created.";
-            return RedirectToAction(nameof(ContactUs));
+            return RedirectToAction(nameof(ContactUs), new { customerEmail = model.CustomerEmail });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult FindMyTickets(string customerEmail)
+        {
+            customerEmail = _supportTicketLookupService.NormalizeEmail(customerEmail);
+            RememberSupportEmail(customerEmail);
+            return RedirectToAction(nameof(ContactUs), new { customerEmail });
         }
 
         public IActionResult AdminTickets()
@@ -114,18 +131,18 @@ model.Message == "")
             if (string.IsNullOrWhiteSpace(ticket.AdminReply))
             {
                 TempData["ErrorMessage"] = "Wait for the admin reply before sending your follow-up.";
-                return RedirectToAction(nameof(ContactUs));
+                return RedirectToAction(nameof(ContactUs), new { customerEmail = GetCurrentSupportEmail(null) });
             }
 
             if (!_supportTicketReplyService.AddCustomerReply(ticket, Clean(model.ReplyText)))
             {
                 TempData["ErrorMessage"] = "Reply cannot be empty.";
-                return RedirectToAction(nameof(ContactUs));
+                return RedirectToAction(nameof(ContactUs), new { customerEmail = GetCurrentSupportEmail(null) });
             }
 
             _db.SaveChanges();
             TempData["SuccessMessage"] = $"Reply sent for ticket #{ticket.Id}.";
-            return RedirectToAction(nameof(ContactUs));
+            return RedirectToAction(nameof(ContactUs), new { customerEmail = GetCurrentSupportEmail(null) });
         }
 
         private string GetCustomerName()
@@ -138,14 +155,39 @@ model.Message == "")
                 .FirstOrDefault() ?? "";
         }
 
-        private List<SupportTicket> GetMyTickets()
+        private string GetCurrentSupportEmail(string? emailFromRequest)
         {
-            if (!CurrentConsumerId.HasValue) return new List<SupportTicket>();
+            if (CurrentConsumerId.HasValue)
+            {
+                var consumerEmail = _db.Consumers
+                    .Where(x => x.Id == CurrentConsumerId.Value)
+                    .Select(x => x.Email)
+                    .FirstOrDefault();
 
-            return _db.SupportTickets
-                .Where(x => x.ConsumerId == CurrentConsumerId.Value)
-                .OrderByDescending(x => x.CreatedAt)
-                .ToList();
+                return _supportTicketLookupService.NormalizeEmail(consumerEmail);
+            }
+
+            if (!string.IsNullOrWhiteSpace(emailFromRequest))
+            {
+                return _supportTicketLookupService.NormalizeEmail(emailFromRequest);
+            }
+
+            return _supportTicketLookupService.NormalizeEmail(HttpContext.Session.GetString(SupportEmailSessionKey));
+        }
+
+        private void RememberSupportEmail(string email)
+        {
+            if (CurrentConsumerId.HasValue)
+            {
+                return;
+            }
+
+            HttpContext.Session.SetString(SupportEmailSessionKey, _supportTicketLookupService.NormalizeEmail(email));
+        }
+
+        private List<SupportTicket> GetMyTickets(string? customerEmail)
+        {
+            return _supportTicketLookupService.GetTickets(_db, CurrentConsumerId, customerEmail);
         }
 
         private static string Clean(string? text)

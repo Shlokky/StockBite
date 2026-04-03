@@ -15,6 +15,17 @@
     <div class="col-lg-5">
         <div class="card app-card">
             <div class="card-body">
+                <h5 class="mb-3">Open Tickets By Email</h5>
+                <form asp-action="FindMyTickets" method="post" class="mb-4">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label" for="LookupCustomerEmail">Email</label>
+                        <input class="form-control" id="LookupCustomerEmail" name="customerEmail" value="@Model.CustomerEmail" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-light">Open My Tickets</button>
+                </form>
+
+                <hr class="my-4" />
                 <h5 class="mb-3">Create Ticket</h5>
                 <form asp-action="ContactUs" method="post">
                     @Html.AntiForgeryToken()

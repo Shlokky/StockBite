@@ -1,3 +1,5 @@
+@model StockBite.ViewModels.ConsumerAccessViewModel
+
 @{
     ViewData["Title"] = "Consumer Access";
     var googleEnabled = ViewBag.GoogleEnabled is bool googleValue && googleValue;
@@ -8,7 +10,7 @@
         <div class="login-card-copy">
             <span class="landing-tag">Consumer Access</span>
             <h1 class="mt-3">Consumer / User</h1>
-            <p class="text-muted mb-4">Continue as guest or sign in with Google.</p>
+            <p class="text-muted mb-4">Sign up, verify with email, sign in with email, continue with Google, or keep using guest mode.</p>
 
             @if (TempData["ErrorMessage"] != null)
             {
@@ -31,9 +33,66 @@
                 </div>
             }
 
-            <div class="d-grid gap-3 mb-4">
-                <a asp-controller="Home" asp-action="StartGuestCheckout" class="btn btn-primary">Continue As Guest</a>
+            <div class="consumer-access-grid">
+                <div class="consumer-access-panel">
+                    <h5 class="mb-3">Sign Up With Email</h5>
+                    <form asp-controller="Home" asp-action="SignUpWithEmail" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label" for="SignUpName">Name</label>
+                            <input class="form-control" id="SignUpName" name="SignUpName" value="@Model.SignUpName" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="SignUpEmail">Email</label>
+                            <input class="form-control" id="SignUpEmail" name="SignUpEmail" value="@Model.SignUpEmail" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Send Verification Code</button>
+                    </form>
+                </div>
+
+                <div class="consumer-access-panel">
+                    <h5 class="mb-3">Verify Email</h5>
+                    <form asp-controller="Home" asp-action="VerifyEmailSignUp" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label" for="VerificationEmail">Email</label>
+                            <input class="form-control" id="VerificationEmail" name="VerificationEmail" value="@Model.VerificationEmail" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="VerificationCode">Code</label>
+                            <input class="form-control" id="VerificationCode" name="VerificationCode" value="@Model.VerificationCode" />
+                        </div>
+                        <button type="submit" class="btn btn-outline-light w-100">Verify And Enter</button>
+                    </form>
+                </div>
+
+                <div class="consumer-access-panel">
+                    <h5 class="mb-3">Sign In With Email</h5>
+                    <form asp-controller="Home" asp-action="StartEmailLogin" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label" for="LoginEmail">Email</label>
+                            <input class="form-control" id="LoginEmail" name="LoginEmail" value="@Model.LoginEmail" />
+                        </div>
+                        <button type="submit" class="btn btn-outline-info w-100">Send Login Code</button>
+                    </form>
+
+                    <form asp-controller="Home" asp-action="VerifyEmailLogin" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label" for="LoginEmailVerify">Email</label>
+                            <input class="form-control" id="LoginEmailVerify" name="LoginEmail" value="@Model.LoginEmail" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="LoginCode">Code</label>
+                            <input class="form-control" id="LoginCode" name="LoginCode" value="@Model.LoginCode" />
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Login</button>
+                    </form>
+                </div>
             </div>
+
+            <hr class="my-4" />
 
             <form asp-controller="Home" asp-action="StartExternalLogin" method="post" class="mb-4">
                 @Html.AntiForgeryToken()
@@ -58,6 +117,10 @@
             }
 
             <hr class="my-4" />
+
+            <div class="d-grid gap-3 mb-4">
+                <a asp-controller="Home" asp-action="StartGuestCheckout" class="btn btn-primary">Continue As Guest</a>
+            </div>
 
             <form asp-controller="Home" asp-action="ContinueGuest" method="post">
                 @Html.AntiForgeryToken()
