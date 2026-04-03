@@ -77,6 +77,23 @@ jobs:
           }
           $json | ConvertTo-Json -Depth 10 | Set-Content $path
 
+      - name: Put app offline with direct FTP upload
+        shell: powershell
+        run: |
+          $content = "StockBite is updating. Please refresh in a minute."
+          $bytes = [System.Text.Encoding]::UTF8.GetBytes($content)
+          $request = [System.Net.FtpWebRequest]::Create("ftp://${{ secrets.FTP_SERVER }}/www.Stockbite.somee.com/app_offline.htm")
+          $request.Method = [System.Net.WebRequestMethods+Ftp]::UploadFile
+          $request.Credentials = New-Object System.Net.NetworkCredential("${{ secrets.FTP_USERNAME }}", "${{ secrets.FTP_PASSWORD }}")
+          $request.UseBinary = $true
+          $request.KeepAlive = $false
+          $request.ContentLength = $bytes.Length
+          $stream = $request.GetRequestStream()
+          $stream.Write($bytes, 0, $bytes.Length)
+          $stream.Close()
+          $response = $request.GetResponse()
+          $response.Close()
+
       - name: Deploy published files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
