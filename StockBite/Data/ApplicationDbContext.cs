@@ -27,6 +27,7 @@ namespace StockBite.Data
                 entity.Property(e => e.Description).HasMaxLength(500);
                 entity.Property(e => e.Category).HasMaxLength(50).IsRequired();
                 entity.Property(e => e.ImageUrl).HasMaxLength(500);
+                entity.Property(e => e.Price).HasColumnType("decimal(10,2)");
             });
 
             modelBuilder.Entity<Vendor>(entity =>
@@ -77,6 +78,7 @@ namespace StockBite.Data
                 entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
                 entity.Property(e => e.GuestCode).HasMaxLength(50);
                 entity.Property(e => e.Email).HasMaxLength(200);
+                entity.Property(e => e.Password).HasMaxLength(200);
                 entity.Property(e => e.EmailAccessCode).HasMaxLength(20);
                 entity.Property(e => e.EmailCodePurpose).HasMaxLength(20);
             });

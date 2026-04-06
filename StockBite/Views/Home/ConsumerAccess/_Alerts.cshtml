@@ -1,0 +1,20 @@
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger consumer-auth-alert" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(ViewBag.ExternalError as string))
+{
+    <div class="alert alert-danger consumer-auth-alert" role="alert">
+        @ViewBag.ExternalError
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success consumer-auth-alert" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}

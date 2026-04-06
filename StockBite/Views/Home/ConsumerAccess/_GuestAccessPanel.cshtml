@@ -1,0 +1,19 @@
+<div class="consumer-auth-block">
+    <h3>Guest access</h3>
+    <p>Place an order quickly or reopen guest orders with your tracking code.</p>
+
+    <div class="consumer-auth-guest-actions">
+        <a asp-controller="Home" asp-action="StartGuestCheckout" class="btn consumer-auth-secondary-button text-center">Continue as guest</a>
+    </div>
+
+    <form asp-controller="Home" asp-action="ContinueGuest" method="post" class="consumer-auth-form">
+        @Html.AntiForgeryToken()
+
+        <div>
+            <label class="consumer-auth-label" for="guestCode">Guest code</label>
+            <input type="text" class="form-control consumer-auth-input text-uppercase" id="guestCode" name="guestCode" placeholder="Enter your guest code" />
+        </div>
+
+        <button type="submit" class="btn consumer-auth-secondary-button">Open guest orders</button>
+    </form>
+</div>

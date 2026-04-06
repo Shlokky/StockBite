@@ -1,0 +1,24 @@
+@model bool
+
+@{
+    var isSignUpPage = Model;
+}
+
+<div class="consumer-auth-card-header">
+    @if (isSignUpPage)
+    {
+        <h2>Create new account</h2>
+        <p>
+            Already have an account?
+            <a asp-controller="Home" asp-action="ConsumerAccess" class="consumer-auth-link">Go to login</a>
+        </p>
+    }
+    else
+    {
+        <h2>Welcome back</h2>
+        <p>
+            New here?
+            <a asp-controller="Home" asp-action="ConsumerSignUp" target="_blank" rel="noopener noreferrer" class="consumer-auth-link">Sign up</a>
+        </p>
+    }
+</div>

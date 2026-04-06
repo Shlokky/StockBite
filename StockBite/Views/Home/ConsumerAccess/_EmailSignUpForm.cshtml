@@ -1,0 +1,27 @@
+@model StockBite.ViewModels.ConsumerAccessViewModel
+
+<div class="consumer-auth-block">
+    <h3>Create account</h3>
+    <p>Enter your details and the verification code will be sent automatically.</p>
+
+    <form asp-controller="Home" asp-action="SignUpWithEmail" method="post" class="consumer-auth-form">
+        @Html.AntiForgeryToken()
+
+        <div>
+            <label class="consumer-auth-label" for="SignUpName">Full name</label>
+            <input class="form-control consumer-auth-input" id="SignUpName" name="SignUpName" value="@Model.SignUpName" />
+        </div>
+
+        <div>
+            <label class="consumer-auth-label" for="SignUpEmail">Email address</label>
+            <input class="form-control consumer-auth-input" id="SignUpEmail" name="SignUpEmail" value="@Model.SignUpEmail" />
+        </div>
+
+        <div>
+            <label class="consumer-auth-label" for="SignUpPassword">Password</label>
+            <input type="password" class="form-control consumer-auth-input" id="SignUpPassword" name="SignUpPassword" value="@Model.SignUpPassword" />
+        </div>
+
+        <button type="submit" class="btn consumer-auth-primary-button">Create account</button>
+    </form>
+</div>

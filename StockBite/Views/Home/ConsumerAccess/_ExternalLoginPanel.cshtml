@@ -1,0 +1,27 @@
+@model bool
+
+<div class="consumer-auth-block">
+    <h3>Continue with Google</h3>
+    <p>Use Google directly if it is enabled on the server.</p>
+
+    <form asp-controller="Home" asp-action="StartExternalLogin" method="post">
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="social-login-btn social-login-google consumer-auth-google-button w-100" @(Model ? null : "disabled")>
+            <span class="social-login-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="img" focusable="false">
+                    <path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.3-1.6 3.9-5.4 3.9-3.2 0-5.9-2.7-5.9-6s2.7-6 5.9-6c1.9 0 3.2.8 3.9 1.5l2.7-2.6C16.8 3.3 14.6 2.4 12 2.4A9.6 9.6 0 0 0 2.4 12 9.6 9.6 0 0 0 12 21.6c5.5 0 9.1-3.8 9.1-9.2 0-.6-.1-1.1-.2-1.6H12z" />
+                    <path fill="#4285F4" d="M2.4 7.9l3.2 2.3C6.4 8 9 6 12 6c1.9 0 3.2.8 3.9 1.5l2.7-2.6C16.8 3.3 14.6 2.4 12 2.4c-3.7 0-7 2.1-8.6 5.5z" />
+                    <path fill="#FBBC05" d="M12 21.6c2.5 0 4.7-.8 6.3-2.3l-2.9-2.4c-.8.6-1.9 1.1-3.4 1.1-3.7 0-5.1-2.5-5.3-3.8l-3.2 2.5c1.6 3.4 5 5.5 8.5 5.5z" />
+                    <path fill="#34A853" d="M2.4 16.1l3.2-2.5c.5 1.5 1.9 3.8 5.3 3.8 2 0 3.6-.8 4.5-2l3 2.4c-1.8 1.7-4.1 2.8-6.9 2.8-3.7 0-7-2.1-8.6-5.5z" />
+                </svg>
+            </span>
+            <span>Continue with Google</span>
+        </button>
+    </form>
+
+    @if (!Model)
+    {
+        <p class="consumer-auth-helper mb-0">Google sign-in becomes active after the client ID and secret are added on the server.</p>
+    }
+</div>

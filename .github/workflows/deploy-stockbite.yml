@@ -6,9 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build-and-deploy:
     runs-on: windows-latest
@@ -22,6 +19,67 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Validate required secrets
+        shell: powershell
+        run: |
+          function Test-Secret {
+            param(
+              [string]$Value,
+              [string]$Name
+            )
+
+            if ([string]::IsNullOrWhiteSpace($Value)) {
+              throw "Missing required GitHub secret: $Name"
+            }
+          }
+
+          Test-Secret "${{ secrets.FTP_SERVER }}" "FTP_SERVER"
+          Test-Secret "${{ secrets.FTP_USERNAME }}" "FTP_USERNAME"
+          Test-Secret "${{ secrets.FTP_PASSWORD }}" "FTP_PASSWORD"
+
+          $smtpHost = "${{ secrets.SMTP_HOST }}"
+          if ([string]::IsNullOrWhiteSpace($smtpHost)) {
+            $smtpHost = "${{ secrets.EMAIL_HOST }}"
+          }
+
+          $smtpPort = "${{ secrets.SMTP_PORT }}"
+          if ([string]::IsNullOrWhiteSpace($smtpPort)) {
+            $smtpPort = "${{ secrets.EMAIL_PORT }}"
+          }
+
+          $smtpSenderEmail = "${{ secrets.SMTP_SENDER_EMAIL }}"
+          if ([string]::IsNullOrWhiteSpace($smtpSenderEmail)) {
+            $smtpSenderEmail = "${{ secrets.EMAIL_SENDER_EMAIL }}"
+          }
+
+          $smtpSenderName = "${{ secrets.SMTP_SENDER_NAME }}"
+          if ([string]::IsNullOrWhiteSpace($smtpSenderName)) {
+            $smtpSenderName = "${{ secrets.EMAIL_SENDER_NAME }}"
+          }
+
+          $smtpUsername = "${{ secrets.SMTP_USERNAME }}"
+          if ([string]::IsNullOrWhiteSpace($smtpUsername)) {
+            $smtpUsername = "${{ secrets.EMAIL_USERNAME }}"
+          }
+
+          $smtpPassword = "${{ secrets.SMTP_PASSWORD }}"
+          if ([string]::IsNullOrWhiteSpace($smtpPassword)) {
+            $smtpPassword = "${{ secrets.EMAIL_PASSWORD }}"
+          }
+
+          $smtpEnableSsl = "${{ secrets.SMTP_ENABLE_SSL }}"
+          if ([string]::IsNullOrWhiteSpace($smtpEnableSsl)) {
+            $smtpEnableSsl = "true"
+          }
+
+          Test-Secret $smtpHost "SMTP_HOST or EMAIL_HOST"
+          Test-Secret $smtpPort "SMTP_PORT or EMAIL_PORT"
+          Test-Secret $smtpSenderEmail "SMTP_SENDER_EMAIL or EMAIL_SENDER_EMAIL"
+          Test-Secret $smtpSenderName "SMTP_SENDER_NAME or EMAIL_SENDER_NAME"
+          Test-Secret $smtpUsername "SMTP_USERNAME or EMAIL_USERNAME"
+          Test-Secret $smtpPassword "SMTP_PASSWORD or EMAIL_PASSWORD"
+          Test-Secret $smtpEnableSsl "SMTP_ENABLE_SSL"
+
       - name: Restore
         run: dotnet restore ./StockBite/StockBite.csproj
 
@@ -33,52 +91,98 @@ jobs:
         run: |
           $path = ".\publish\appsettings.json"
           $json = Get-Content $path -Raw | ConvertFrom-Json
+
           if (-not $json.Authentication) {
-            $json | Add-Member -MemberType NoteProperty -Name Authentication -Value (@{})
+            $json | Add-Member -MemberType NoteProperty -Name Authentication -Value ([pscustomobject]@{})
           }
+
           if (-not $json.Authentication.Google) {
-            $json.Authentication | Add-Member -MemberType NoteProperty -Name Google -Value (@{})
+            $json.Authentication | Add-Member -MemberType NoteProperty -Name Google -Value ([pscustomobject]@{})
           }
+
           if (-not $json.Email) {
-            $json | Add-Member -MemberType NoteProperty -Name Email -Value (@{})
+            $json | Add-Member -MemberType NoteProperty -Name Email -Value ([pscustomobject]@{})
           }
+
           $googleClientId = "${{ secrets.GOOGLE_CLIENT_ID }}"
           $googleClientSecret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+
           $emailHost = "${{ secrets.SMTP_HOST }}"
+          if ([string]::IsNullOrWhiteSpace($emailHost)) {
+            $emailHost = "${{ secrets.EMAIL_HOST }}"
+          }
+
           $emailPort = "${{ secrets.SMTP_PORT }}"
+          if ([string]::IsNullOrWhiteSpace($emailPort)) {
+            $emailPort = "${{ secrets.EMAIL_PORT }}"
+          }
+
           $senderEmail = "${{ secrets.SMTP_SENDER_EMAIL }}"
+          if ([string]::IsNullOrWhiteSpace($senderEmail)) {
+            $senderEmail = "${{ secrets.EMAIL_SENDER_EMAIL }}"
+          }
+
           $senderName = "${{ secrets.SMTP_SENDER_NAME }}"
+          if ([string]::IsNullOrWhiteSpace($senderName)) {
+            $senderName = "${{ secrets.EMAIL_SENDER_NAME }}"
+          }
+
           $emailUsername = "${{ secrets.SMTP_USERNAME }}"
+          if ([string]::IsNullOrWhiteSpace($emailUsername)) {
+            $emailUsername = "${{ secrets.EMAIL_USERNAME }}"
+          }
+
           $emailPassword = "${{ secrets.SMTP_PASSWORD }}"
+          if ([string]::IsNullOrWhiteSpace($emailPassword)) {
+            $emailPassword = "${{ secrets.EMAIL_PASSWORD }}"
+          }
+
           $emailEnableSsl = "${{ secrets.SMTP_ENABLE_SSL }}"
+          if ([string]::IsNullOrWhiteSpace($emailEnableSsl)) {
+            $emailEnableSsl = "true"
+          }
+
           if (-not [string]::IsNullOrWhiteSpace($googleClientId)) {
             $json.Authentication.Google.ClientId = $googleClientId
           }
+
           if (-not [string]::IsNullOrWhiteSpace($googleClientSecret)) {
             $json.Authentication.Google.ClientSecret = $googleClientSecret
           }
-          if (-not [string]::IsNullOrWhiteSpace($emailHost)) {
-            $json.Email.Host = $emailHost
-          }
-          if (-not [string]::IsNullOrWhiteSpace($emailPort)) {
-            $json.Email.Port = [int]$emailPort
-          }
-          if (-not [string]::IsNullOrWhiteSpace($senderEmail)) {
-            $json.Email.SenderEmail = $senderEmail
-          }
-          if (-not [string]::IsNullOrWhiteSpace($senderName)) {
-            $json.Email.SenderName = $senderName
-          }
-          if (-not [string]::IsNullOrWhiteSpace($emailUsername)) {
-            $json.Email.Username = $emailUsername
-          }
-          if (-not [string]::IsNullOrWhiteSpace($emailPassword)) {
-            $json.Email.Password = $emailPassword
-          }
-          if (-not [string]::IsNullOrWhiteSpace($emailEnableSsl)) {
-            $json.Email.EnableSsl = [System.Convert]::ToBoolean($emailEnableSsl)
-          }
+
+          $json.Email.Host = $emailHost
+          $json.Email.Port = [int]$emailPort
+          $json.Email.SenderEmail = $senderEmail
+          $json.Email.SenderName = $senderName
+          $json.Email.Username = $emailUsername
+          $json.Email.Password = $emailPassword
+          $json.Email.EnableSsl = [System.Convert]::ToBoolean($emailEnableSsl)
+
           $json | ConvertTo-Json -Depth 10 | Set-Content $path
+
+      - name: Confirm injected email settings
+        shell: powershell
+        run: |
+          $path = ".\publish\appsettings.json"
+          $json = Get-Content $path -Raw | ConvertFrom-Json
+
+          if ([string]::IsNullOrWhiteSpace($json.Email.Host)) {
+            throw "Published appsettings.json has empty Email.Host"
+          }
+
+          if ([string]::IsNullOrWhiteSpace($json.Email.SenderEmail)) {
+            throw "Published appsettings.json has empty Email.SenderEmail"
+          }
+
+          if ([string]::IsNullOrWhiteSpace($json.Email.Username)) {
+            throw "Published appsettings.json has empty Email.Username"
+          }
+
+          if ([string]::IsNullOrWhiteSpace($json.Email.Password)) {
+            throw "Published appsettings.json has empty Email.Password"
+          }
+
+          Write-Host "Email settings were injected successfully."
 
       - name: Upload app_offline.htm
         shell: powershell
@@ -149,6 +253,7 @@ jobs:
           }
 
       - name: Remove app_offline.htm
+        if: always()
         shell: powershell
         run: |
           $request = [System.Net.FtpWebRequest]::Create("ftp://${{ secrets.FTP_SERVER }}/www.Stockbite.somee.com/app_offline.htm")

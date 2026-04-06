@@ -1,0 +1,23 @@
+@model StockBite.ViewModels.ConsumerAccessViewModel
+
+<div class="consumer-auth-block">
+    <h3>Verify your email</h3>
+    <p>Enter the code from your email to finish creating the account.</p>
+
+    <form asp-controller="Home" asp-action="VerifyEmailSignUp" method="post" class="consumer-auth-form">
+        @Html.AntiForgeryToken()
+
+        <div>
+            <input type="hidden" name="VerificationEmail" value="@Model.VerificationEmail" />
+            <label class="consumer-auth-label">Email address</label>
+            <div class="consumer-auth-readonly">@Model.VerificationEmail</div>
+        </div>
+
+        <div>
+            <label class="consumer-auth-label" for="VerificationCode">Verification code</label>
+            <input class="form-control consumer-auth-input" id="VerificationCode" name="VerificationCode" value="@Model.VerificationCode" />
+        </div>
+
+        <button type="submit" class="btn consumer-auth-primary-button">Verify account</button>
+    </form>
+</div>

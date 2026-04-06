@@ -8,6 +8,7 @@ namespace StockBite.Models
         public string Name { get; set; } = string.Empty;
         public string GuestCode { get; set; } = string.Empty;
         public string? Email { get; set; }
+        public string Password { get; set; } = string.Empty;
         public bool EmailVerified { get; set; }
         public string? EmailAccessCode { get; set; }
         public string? EmailCodePurpose { get; set; }

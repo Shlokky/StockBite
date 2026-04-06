@@ -1,0 +1,22 @@
+@model StockBite.ViewModels.ConsumerAccessViewModel
+
+<div class="consumer-auth-block">
+    <h3>Enter login code</h3>
+    <p>The login code was already sent automatically to your email.</p>
+
+    <form asp-controller="Home" asp-action="VerifyEmailLogin" method="post" class="consumer-auth-form">
+        @Html.AntiForgeryToken()
+
+        <div>
+            <label class="consumer-auth-label" for="LoginEmailVerify">Email address</label>
+            <input class="form-control consumer-auth-input" id="LoginEmailVerify" name="LoginEmail" value="@Model.LoginEmail" />
+        </div>
+
+        <div>
+            <label class="consumer-auth-label" for="LoginCode">Login code</label>
+            <input class="form-control consumer-auth-input" id="LoginCode" name="LoginCode" value="@Model.LoginCode" />
+        </div>
+
+        <button type="submit" class="btn consumer-auth-primary-button">Log in</button>
+    </form>
+</div>

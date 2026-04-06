@@ -151,6 +151,10 @@ namespace StockBite.Data
                 BEGIN
                     ALTER TABLE Consumers ADD Email nvarchar(200) NULL
                 END
+                IF COL_LENGTH('Consumers', 'Password') IS NULL
+                BEGIN
+                    ALTER TABLE Consumers ADD Password nvarchar(200) NOT NULL DEFAULT ''
+                END
                 IF COL_LENGTH('Consumers', 'EmailVerified') IS NULL
                 BEGIN
                     ALTER TABLE Consumers ADD EmailVerified bit NOT NULL DEFAULT 0
